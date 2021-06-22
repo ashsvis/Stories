@@ -4,10 +4,16 @@ using System.Windows.Forms;
 
 namespace Stories.Model
 {
+    /// <summary>
+    /// Статический класс библиотеки типов, содержит список поддерживаемых типов
+    /// </summary>
     public static class StoryLibrary
     {
         private static Type[] controls;
 
+        /// <summary>
+        /// Инициализация внутреннего массива
+        /// </summary>
         public static void Init()
         {
             controls = new Type[] 
@@ -20,6 +26,10 @@ namespace Stories.Model
             };
         }
 
+        /// <summary>
+        /// Функция публикует доступные типы из библиотеки
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<Type> GetControlTypes()
         {
             return controls;
