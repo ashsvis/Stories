@@ -147,6 +147,7 @@ namespace Stories
             // panStory
             // 
             this.panStory.BackColor = System.Drawing.Color.White;
+            this.panStory.Cursor = System.Windows.Forms.Cursors.Default;
             this.panStory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panStory.Location = new System.Drawing.Point(0, 0);
             this.panStory.Name = "panStory";
@@ -174,6 +175,7 @@ namespace Stories
             // 
             // tvStory
             // 
+            this.tvStory.Cursor = System.Windows.Forms.Cursors.Default;
             this.tvStory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvStory.Location = new System.Drawing.Point(0, 0);
             this.tvStory.Name = "tvStory";
@@ -182,6 +184,7 @@ namespace Stories
             // 
             // pgStoryElement
             // 
+            this.pgStoryElement.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.pgStoryElement.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgStoryElement.Location = new System.Drawing.Point(0, 0);
             this.pgStoryElement.Name = "pgStoryElement";
