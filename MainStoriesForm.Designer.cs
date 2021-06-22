@@ -35,7 +35,11 @@ namespace Stories
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.panStory = new System.Windows.Forms.Panel();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tcSelector = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tvStory = new System.Windows.Forms.TreeView();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tvLibrary = new System.Windows.Forms.TreeView();
             this.pgStoryElement = new System.Windows.Forms.PropertyGrid();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,6 +94,9 @@ namespace Stories
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.tcSelector.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -127,7 +134,8 @@ namespace Stories
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Cursor = System.Windows.Forms.Cursors.VSplit;
+            this.splitContainer1.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.splitContainer1.Cursor = System.Windows.Forms.Cursors.Default;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
@@ -141,7 +149,8 @@ namespace Stories
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(800, 379);
-            this.splitContainer1.SplitterDistance = 593;
+            this.splitContainer1.SplitterDistance = 595;
+            this.splitContainer1.SplitterWidth = 2;
             this.splitContainer1.TabIndex = 0;
             // 
             // panStory
@@ -151,11 +160,12 @@ namespace Stories
             this.panStory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panStory.Location = new System.Drawing.Point(0, 0);
             this.panStory.Name = "panStory";
-            this.panStory.Size = new System.Drawing.Size(593, 379);
+            this.panStory.Size = new System.Drawing.Size(595, 379);
             this.panStory.TabIndex = 0;
             // 
             // splitContainer2
             // 
+            this.splitContainer2.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.splitContainer2.Cursor = System.Windows.Forms.Cursors.HSplit;
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
@@ -164,31 +174,75 @@ namespace Stories
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.tvStory);
+            this.splitContainer2.Panel1.Controls.Add(this.tcSelector);
             // 
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.pgStoryElement);
             this.splitContainer2.Size = new System.Drawing.Size(203, 379);
             this.splitContainer2.SplitterDistance = 180;
+            this.splitContainer2.SplitterWidth = 2;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // tcSelector
+            // 
+            this.tcSelector.Controls.Add(this.tabPage1);
+            this.tcSelector.Controls.Add(this.tabPage2);
+            this.tcSelector.Cursor = System.Windows.Forms.Cursors.Default;
+            this.tcSelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tcSelector.Location = new System.Drawing.Point(0, 0);
+            this.tcSelector.Name = "tcSelector";
+            this.tcSelector.SelectedIndex = 0;
+            this.tcSelector.Size = new System.Drawing.Size(203, 180);
+            this.tcSelector.TabIndex = 1;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.tvStory);
+            this.tabPage1.Location = new System.Drawing.Point(4, 24);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(195, 152);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Project";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tvStory
             // 
             this.tvStory.Cursor = System.Windows.Forms.Cursors.Default;
             this.tvStory.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tvStory.Location = new System.Drawing.Point(0, 0);
+            this.tvStory.Location = new System.Drawing.Point(3, 3);
             this.tvStory.Name = "tvStory";
-            this.tvStory.Size = new System.Drawing.Size(203, 180);
+            this.tvStory.Size = new System.Drawing.Size(189, 146);
             this.tvStory.TabIndex = 0;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.tvLibrary);
+            this.tabPage2.Location = new System.Drawing.Point(4, 24);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(195, 152);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Library";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tvLibrary
+            // 
+            this.tvLibrary.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.tvLibrary.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvLibrary.Location = new System.Drawing.Point(3, 3);
+            this.tvLibrary.Name = "tvLibrary";
+            this.tvLibrary.Size = new System.Drawing.Size(189, 146);
+            this.tvLibrary.TabIndex = 0;
             // 
             // pgStoryElement
             // 
-            this.pgStoryElement.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.pgStoryElement.Cursor = System.Windows.Forms.Cursors.Default;
             this.pgStoryElement.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgStoryElement.Location = new System.Drawing.Point(0, 0);
             this.pgStoryElement.Name = "pgStoryElement";
-            this.pgStoryElement.Size = new System.Drawing.Size(203, 195);
+            this.pgStoryElement.Size = new System.Drawing.Size(203, 197);
             this.pgStoryElement.TabIndex = 0;
             // 
             // menuStrip1
@@ -292,6 +346,7 @@ namespace Stories
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
             // 
@@ -553,6 +608,9 @@ namespace Stories
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.tcSelector.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
@@ -611,6 +669,10 @@ namespace Stories
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.TreeView tvStory;
         private System.Windows.Forms.PropertyGrid pgStoryElement;
+        private System.Windows.Forms.TabControl tcSelector;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TreeView tvLibrary;
     }
 }
 
