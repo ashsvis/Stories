@@ -1,4 +1,5 @@
 ﻿using Stories.Model;
+using Stories.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,10 +14,26 @@ namespace Stories
 {
     public partial class MainStoriesForm : Form
     {
+        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContentList.json";
+        private StoryContent storyContent = new StoryContent();
+        private FileIOService fileIOService;
+
+        private RectangleRibbonSelector ribbonSelector;
+
         public MainStoriesForm()
         {
             InitializeComponent();
             StoryLibrary.Init();
+
+            // создаём объект рамки выбора фигур
+            ribbonSelector = new RectangleRibbonSelector(panStory);
+            ribbonSelector.OnSelected += RibbonSelector_OnSelected;
+        }
+
+        private void RibbonSelector_OnSelected(object sender, RibbonSelectedEventArgs e)
+        {
+            // пока что просто выводим в консоль координаты выбора прямоугольником
+            Console.WriteLine(e.RectangleSelected);
         }
 
         /// <summary>
@@ -26,13 +43,27 @@ namespace Stories
         /// <param name="e"></param>
         private void MainStoriesForm_Load(object sender, EventArgs e)
         {
+            //fileIOService = new FileIOService(PATH);
+            //try
+            //{
+            //    storyContent.Controls = fileIOService.LoadData();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //    Close();
+            //}
+
             tvLibrary.Nodes.Clear();
             foreach (var type in StoryLibrary.GetControlTypes())
             {
                 // имя типа составное и содержит имена namespace
                 var names = $"{type}".Split('.');
                 // поэтому забираем только крайнее правое, имя типа
-                tvLibrary.Nodes.Add(new TreeNode(names[names.Length - 1]) { Tag = type });
+                tvLibrary.Nodes.Add(new TreeNode(names[names.Length - 1]) 
+                { 
+                    Tag = type 
+                });
             }
         }
 
@@ -92,6 +123,7 @@ namespace Stories
                 var typeNode = (TreeNode)e.Data.GetData(typeof(TreeNode));
                 // создаем контрол из переданного типа
                 var element = (Control)Activator.CreateInstance((Type)typeNode.Tag);
+
                 // присваиваем видимое тесктовое значение по умолчанию
                 element.Text = typeNode.Text;
                 // располагаем верхний левый угол в точке сбрасывания
@@ -100,6 +132,12 @@ namespace Stories
                 panStory.Controls.Add(element);
                 // прицепляем клик на вновь поставленный элемент
                 element.Click += Element_Click;
+
+                
+                storyContent.Controls.Add(element);
+
+                //fileIOService.SaveData(storyContent.Controls);
+
                 // добавляем новый элемент в дерево проекта
                 var controlNode = new TreeNode(element.Text) { Tag = element };
                 tvStory.Nodes.Add(controlNode);
