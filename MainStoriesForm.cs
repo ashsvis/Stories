@@ -15,6 +15,7 @@ namespace Stories
         private FileIOService fileIOService;
 
         private RectangleRibbonSelector ribbonSelector;
+        private SelectionHolder selHolder;
 
         public MainStoriesForm()
         {
@@ -22,14 +23,23 @@ namespace Stories
             StoryLibrary.Init();
 
             // создаём объект рамки выбора фигур
-            ribbonSelector = new RectangleRibbonSelector(panStory);
+            ribbonSelector = new RectangleRibbonSelector(panStory, new Pen(Color.Fuchsia) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot });
             ribbonSelector.OnSelected += RibbonSelector_OnSelected;
+
+            selHolder = new SelectionHolder(panStory);
         }
 
         private void RibbonSelector_OnSelected(object sender, RibbonSelectedEventArgs e)
         {
-            // пока что просто выводим в консоль координаты выбора прямоугольником
-            Console.WriteLine(e.RectangleSelected);
+            var rect = e.RectangleSelected;
+            selHolder.Clear();
+            foreach (var control in panStory.Controls.Cast<Control>())
+            {
+                if (Rectangle.Intersect(control.Bounds, rect).IsEmpty) continue;
+                selHolder.Add(control);
+            }
+            pgStoryElement.SelectedObject = null;
+            pgStoryElement.SelectedObjects = selHolder.GetSelected();
         }
 
         /// <summary>
@@ -195,6 +205,9 @@ namespace Stories
             tvStory.SelectedNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(item => item.Tag == sender);
             // передаем его сетке свойств
             pgStoryElement.SelectedObject = sender;
+
+            selHolder.Clear();
+            selHolder.Add((Control)sender);
         }
 
         /// <summary>
