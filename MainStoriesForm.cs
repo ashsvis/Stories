@@ -1,20 +1,16 @@
 ﻿using Stories.Model;
 using Stories.Services;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Stories
 {
     public partial class MainStoriesForm : Form
     {
-        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContentList.json";
+        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContent.cfg";
         private StoryContent storyContent = new StoryContent();
         private FileIOService fileIOService;
 
@@ -43,16 +39,16 @@ namespace Stories
         /// <param name="e"></param>
         private void MainStoriesForm_Load(object sender, EventArgs e)
         {
-            //fileIOService = new FileIOService(PATH);
-            //try
-            //{
-            //    storyContent.Controls = fileIOService.LoadData();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //    Close();
-            //}
+            fileIOService = new FileIOService(PATH);
+            try
+            {
+                storyContent.Items = fileIOService.LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                Close();
+            }
 
             tvLibrary.Nodes.Clear();
             foreach (var type in StoryLibrary.GetControlTypes())
@@ -133,10 +129,10 @@ namespace Stories
                 // прицепляем клик на вновь поставленный элемент
                 element.Click += Element_Click;
 
-                
-                storyContent.Controls.Add(element);
 
-                //fileIOService.SaveData(storyContent.Controls);
+                storyContent.Items.Add(element);
+
+                ContentChanged = true;
 
                 // добавляем новый элемент в дерево проекта
                 var controlNode = new TreeNode(element.Text) { Tag = element };
@@ -145,6 +141,26 @@ namespace Stories
                 tvStory.SelectedNode = controlNode;
             }
 
+        }
+
+        private bool contentChanged;
+
+        public bool ContentChanged
+        {
+            get { return contentChanged; }
+            set 
+            {
+                if (contentChanged == value) return;
+                contentChanged = value;
+                saveAsToolStripMenuItem.Enabled = contentChanged;
+                saveToolStripButton.Enabled = contentChanged;
+            }
+        }
+
+        private void SaveContent()
+        {
+            fileIOService.SaveData(storyContent.Items);
+            ContentChanged = false;
         }
 
         /// <summary>
@@ -174,6 +190,16 @@ namespace Stories
                 pgStoryElement.SelectedObject = e.Node.Tag;
             else
                 pgStoryElement.SelectedObject = null;
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveContent();
+        }
+
+        private void pgStoryElement_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            ContentChanged = true;
         }
     }
 }

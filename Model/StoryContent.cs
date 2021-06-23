@@ -5,6 +5,6 @@ namespace Stories.Model
 {
     public class StoryContent
     {
-        public List<Control> Controls { get; set; } = new List<Control>();
+        public List<Control> Items { get; set; } = new List<Control>();
     }
 }
