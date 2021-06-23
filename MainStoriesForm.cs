@@ -48,7 +48,7 @@ namespace Stories
                 foreach (var element in storyContent.Items)
                 {
                     panStory.Controls.Add(element);
-                    element.Click += Element_Click;
+                    AddEventHandlers(element);
                     tvStory.Nodes.Add(new TreeNode(element.Text) { Tag = element });
                 }
             }
@@ -134,21 +134,32 @@ namespace Stories
                 element.Location = panStory.PointToClient(new Point(e.X, e.Y));
                 // добавляем новый контрол в список контролов контейнера
                 panStory.Controls.Add(element);
-                // прицепляем клик на вновь поставленный элемент
-                element.Click += Element_Click;
-
-
+                AddEventHandlers(element);
                 storyContent.Items.Add(element);
-
                 ContentChanged = true;
-
                 // добавляем новый элемент в дерево проекта
                 var controlNode = new TreeNode(element.Text) { Tag = element };
                 tvStory.Nodes.Add(controlNode);
                 // делаем его текущим
                 tvStory.SelectedNode = controlNode;
             }
+        }
 
+        private void AddEventHandlers(Control element)
+        {
+            // прицепляем клик на вновь поставленный элемент
+            element.Click += Element_Click;
+            if (element is CheckBox checkBox)
+                checkBox.CheckedChanged += ValueChanged_Click;
+            if (element is RadioButton radioButton)
+                radioButton.CheckedChanged += ValueChanged_Click;
+            if (element is TextBox textBox)
+                textBox.TextChanged += ValueChanged_Click;
+        }
+
+        private void ValueChanged_Click(object sender, EventArgs e)
+        {
+            ContentChanged = true;
         }
 
         private bool contentChanged;
