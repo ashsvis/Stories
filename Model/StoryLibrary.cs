@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -22,7 +23,8 @@ namespace Stories.Model
                 typeof(Button),
                 typeof(TextBox),
                 typeof(CheckBox),
-                typeof(RadioButton)
+                typeof(RadioButton),
+                typeof(PictureBox)
             };
         }
 
@@ -33,6 +35,11 @@ namespace Stories.Model
         public static IEnumerable<Type> GetControlTypes()
         {
             return controls;
+        }
+
+        public static Type GetTypeByFullName(string fullName)
+        {
+            return controls.FirstOrDefault(item => item.ToString() == fullName);
         }
     }
 }

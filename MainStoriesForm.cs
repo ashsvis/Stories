@@ -10,7 +10,7 @@ namespace Stories
 {
     public partial class MainStoriesForm : Form
     {
-        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContent.cfg";
+        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContent.bin";
         private StoryContent storyContent = new StoryContent();
         private FileIOService fileIOService;
 
@@ -43,6 +43,14 @@ namespace Stories
             try
             {
                 storyContent.Items = fileIOService.LoadData();
+                panStory.Controls.Clear();
+                tvStory.Nodes.Clear();
+                foreach (var element in storyContent.Items)
+                {
+                    panStory.Controls.Add(element);
+                    element.Click += Element_Click;
+                    tvStory.Nodes.Add(new TreeNode(element.Text) { Tag = element });
+                }
             }
             catch (Exception ex)
             {
