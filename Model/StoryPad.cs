@@ -49,15 +49,25 @@ namespace Stories.Model
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 control.DrawToBitmap(bmp, control.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);
+                if (control is PictureBox pBox)
+                {
+                    if (pBox.Image == null)
+                        using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
+                            e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
+                }
+                if (control is Label label)
+                {
+                    if (string.IsNullOrWhiteSpace(label.Text) && label.BorderStyle == BorderStyle.None)
+                        using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
+                            e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
+                }
             }
             if (!dragMode)
             {
                 // рисуем рамки для выбранных элементов
                 foreach (var control in selected)
                 {
-                    var rect = control.Bounds;
-                    rect.Width -= 1;
-                    rect.Height -= 1;
+                    Rectangle rect = CorrectRect(control);
                     rect.Inflate(1, 1);
                     e.Graphics.DrawRectangle(Pens.Fuchsia, rect);
                 }
@@ -79,6 +89,22 @@ namespace Stories.Model
                     e.Graphics.DrawRectangle(Pens.Fuchsia, r);
                 }
             }
+        }
+
+        private static Rectangle CorrectRect(Control control)
+        {
+            var rect = control.Bounds;
+            rect.Width -= 1;
+            rect.Height -= 1;
+            return rect;
+        }
+
+        private static Rectangle CorrectRect(Rectangle bounds)
+        {
+            var rect = bounds;
+            rect.Width -= 1;
+            rect.Height -= 1;
+            return rect;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
