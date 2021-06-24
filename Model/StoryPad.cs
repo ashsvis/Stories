@@ -14,8 +14,10 @@ namespace Stories.Model
         private readonly List<Control> elements = new();
         private readonly List<Control> selected = new();
         private bool dragMode = false;
+        private readonly List<Rectangle> dragRects = new();
 
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
+        public event EventHandler<EventArgs> OnChanged;
 
         private void Init()
         {
@@ -47,14 +49,17 @@ namespace Stories.Model
                 control.DrawToBitmap(bmp, control.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);
             }
-            // рисуем рамки для выбранных элементов
-            foreach (var control in selected)
+            if (!dragMode)
             {
-                var rect = control.Bounds;
-                rect.Width -= 1;
-                rect.Height -= 1;
-                rect.Inflate(1, 1);
-                e.Graphics.DrawRectangle(Pens.Fuchsia, rect);
+                // рисуем рамки для выбранных элементов
+                foreach (var control in selected)
+                {
+                    var rect = control.Bounds;
+                    rect.Width -= 1;
+                    rect.Height -= 1;
+                    rect.Inflate(1, 1);
+                    e.Graphics.DrawRectangle(Pens.Fuchsia, rect);
+                }
             }
             // если прямоугольник выбора не пуст
             if (!ribbonRect.IsEmpty && !dragMode)
@@ -63,12 +68,23 @@ namespace Stories.Model
                 using var pen = new Pen(Color.Fuchsia) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
                 e.Graphics.DrawRectangle(pen, ribbonRect);
             }
+            // в режиме перетаскивания рисуем прямоугольники со смещением delta
+            if (dragMode)
+            {
+                foreach (var rect in dragRects)
+                {
+                    var r = rect;
+                    r.Offset(delta);
+                    e.Graphics.DrawRectangle(Pens.Fuchsia, r);
+                }
+            }
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
             dragMode = false;
+            dragRects.Clear();
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
             {
@@ -77,12 +93,14 @@ namespace Stories.Model
                 // запоминаем точку первую точку выбора начала рисования прямоугольника выбора
                 mouseDownLocation = e.Location;
 
+                // проверка, если есть под курсором уже выбранные, тогда добавляем прямоугольники в список для перетаскивания
                 foreach (var control in elements)
                 {
                     if (control.Bounds.Contains(e.Location) && selected.Contains(control))
                     {
                         // под курсором есть выбранные элементы
                         dragMode = true;
+                        dragRects.AddRange(selected.Select(item => item.Bounds));
                         return;
                     }
                 }
@@ -92,6 +110,8 @@ namespace Stories.Model
                 Invalidate();
             }
         }
+
+        private Point delta = new();
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
@@ -106,6 +126,9 @@ namespace Stories.Model
                 // размеры должны быть всегда положительные числа
                 ribbonRect.Width = Math.Abs(mouseDownLocation.X - e.Location.X);
                 ribbonRect.Height = Math.Abs(mouseDownLocation.Y - e.Location.Y);
+
+                delta = new Point(e.X - mouseDownLocation.X, e.Y - mouseDownLocation.Y);
+
                 // запрашиваем, чтобы обновился
                 Invalidate();
             }
@@ -150,6 +173,22 @@ namespace Stories.Model
                     }
                     OnRibbonSelected(new(ribbonRect, selected));
                 }
+                else
+                {
+                    // был режим перетаскивания
+                    for (var i = 0; i < dragRects.Count; i++)
+                    {
+                        var element = elements.FirstOrDefault(item => item == selected[i]);
+                        if (element == null) continue;
+                        var pt = dragRects[i].Location;
+                        pt.Offset(delta);
+                        element.Location = pt;
+                    }
+                    ribbonRect = Rectangle.Empty;
+                    dragMode = false;
+                    dragRects.Clear();
+                    OnElementsChanged();
+                }
                 Invalidate();
             }
         }
@@ -158,6 +197,12 @@ namespace Stories.Model
         {
             // если на событие подписались, то вызываем его
             OnSelected?.Invoke(this, e);
+        }
+
+        protected virtual void OnElementsChanged(EventArgs e = null)
+        {
+            // если на событие подписались, то вызываем его
+            OnChanged?.Invoke(this, e ?? new());
         }
 
         public void LoadData(IEnumerable<Control> controls)

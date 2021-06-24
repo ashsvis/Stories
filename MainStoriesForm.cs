@@ -239,5 +239,10 @@ namespace Stories
             else
                 tvStory.SelectedNode = null;
         }
+
+        private void storyPad_OnChanged(object sender, EventArgs e)
+        {
+            ContentChanged = true;
+        }
     }
 }
