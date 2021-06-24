@@ -72,7 +72,7 @@ namespace Stories.Services
                     if (!prop.CanWrite || !prop.CanRead) continue;
                     var propName = prop.Name;
                     if (propName == "Left" || propName == "Top" || propName == "Location" ||
-                        propName == "Parent" || propName == "BindingContext") continue;
+                        propName == "Parent" || propName == "BindingContext" || propName == "Cursor") continue;
                     var propValue = prop.GetValue(control);
                     var propValueSample = prop.GetValue(sample);
                     if ($"{propValue}" == $"{propValueSample}") continue;

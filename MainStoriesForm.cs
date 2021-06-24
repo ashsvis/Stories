@@ -43,6 +43,7 @@ namespace Stories
             {
                 MessageBox.Show(ex.Message);
                 Close();
+                return;
             }
 
             tvLibrary.Nodes.Clear();
