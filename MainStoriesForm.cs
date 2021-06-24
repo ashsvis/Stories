@@ -18,7 +18,7 @@ namespace Stories
             InitializeComponent();
             StoryLibrary.Init();
             storyPad.Size = new Size(5000, 5000);
-            panStory.Controls.Add(storyPad);
+            panelCentral.Controls.Add(storyPad);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Stories
             }
         }
 
-        private void panStory_DragOver(object sender, DragEventArgs e)
+        private void storyPad_DragOver(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Move;
         }
@@ -106,7 +106,7 @@ namespace Stories
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void panStory_DragDrop(object sender, DragEventArgs e)
+        private void storyPad_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Effect == DragDropEffects.Move)
             {
@@ -119,9 +119,6 @@ namespace Stories
                 element.Text = typeNode.Text;
                 // располагаем верхний левый угол в точке сбрасывания
                 element.Location = storyPad.PointToClient(new Point(e.X, e.Y));
-                // добавляем новый контрол в список контролов контейнера
-                panStory.Controls.Add(element);
-                //AddEventHandlers(element);
                 storyPad.Add(element);
 
                 ContentChanged = true;
@@ -131,19 +128,6 @@ namespace Stories
                 // делаем его текущим
                 tvStory.SelectedNode = controlNode;
             }
-        }
-
-        private void AddEventHandlers(Control element)
-        {
-            // прицепляем клик на вновь поставленный элемент
-            element.MouseDown += Element_MouseDownClick;
-            element.MouseMove += Element_MouseMoveClick;
-            if (element is CheckBox checkBox)
-                checkBox.CheckedChanged += ValueChanged_Click;
-            if (element is RadioButton radioButton)
-                radioButton.CheckedChanged += ValueChanged_Click;
-            if (element is TextBox textBox)
-                textBox.TextChanged += ValueChanged_Click;
         }
 
         private void ValueChanged_Click(object sender, EventArgs e)
@@ -231,18 +215,40 @@ namespace Stories
 
         private void storyPad_OnSelected(object sender, RibbonSelectedEventArgs e)
         {
-            pgStoryElement.SelectedObjects = e.Selected.ToArray();
             var single = e.Selected.FirstOrDefault();
             pgStoryElement.SelectedObject = single;
             if (single != null)
                 tvStory.SelectedNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(node => node.Tag == single);
             else
                 tvStory.SelectedNode = null;
+            pgStoryElement.SelectedObjects = e.Selected.ToArray();
         }
 
         private void storyPad_OnChanged(object sender, EventArgs e)
         {
             ContentChanged = true;
+        }
+
+        private void contextMenuStripPropertyGrid_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            GridItem item = pgStoryElement.SelectedGridItem;
+            if (pgStoryElement.SelectedObjects == null || pgStoryElement.SelectedObjects.Length <= 1)
+                resetToolStripMenuItem.Enabled = item.PropertyDescriptor.CanResetValue(pgStoryElement.SelectedObject);
+            else
+                resetToolStripMenuItem.Enabled = false;
+        }
+
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GridItem item = pgStoryElement.SelectedGridItem;
+            if (pgStoryElement.SelectedObjects == null || pgStoryElement.SelectedObjects.Length <= 1 &&
+                item.PropertyDescriptor.CanResetValue(pgStoryElement.SelectedObject))
+            {
+                pgStoryElement.ResetSelectedProperty();
+                item.Select();
+                ContentChanged = true;
+                storyPad.Invalidate();
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Stories
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.panStory = new System.Windows.Forms.Panel();
+            this.panelCentral = new System.Windows.Forms.Panel();
             this.storyPad = new Stories.Model.StoryPad(this.components);
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tcSelector = new System.Windows.Forms.TabControl();
@@ -43,6 +43,8 @@ namespace Stories
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tvLibrary = new System.Windows.Forms.TreeView();
             this.pgStoryElement = new System.Windows.Forms.PropertyGrid();
+            this.contextMenuStripPropertyGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,7 +94,7 @@ namespace Stories
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.panStory.SuspendLayout();
+            this.panelCentral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
@@ -100,6 +102,7 @@ namespace Stories
             this.tcSelector.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.contextMenuStripPropertyGrid.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -146,40 +149,42 @@ namespace Stories
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.panStory);
+            this.splitContainer1.Panel1.Controls.Add(this.panelCentral);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(800, 379);
-            this.splitContainer1.SplitterDistance = 538;
+            this.splitContainer1.SplitterDistance = 546;
             this.splitContainer1.SplitterWidth = 2;
             this.splitContainer1.TabIndex = 0;
             // 
-            // panStory
+            // panelCentral
             // 
-            this.panStory.AllowDrop = true;
-            this.panStory.AutoScroll = true;
-            this.panStory.BackColor = System.Drawing.Color.White;
-            this.panStory.Controls.Add(this.storyPad);
-            this.panStory.Cursor = System.Windows.Forms.Cursors.Default;
-            this.panStory.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panStory.Location = new System.Drawing.Point(0, 0);
-            this.panStory.Name = "panStory";
-            this.panStory.Size = new System.Drawing.Size(538, 379);
-            this.panStory.TabIndex = 0;
-            this.panStory.DragDrop += new System.Windows.Forms.DragEventHandler(this.panStory_DragDrop);
-            this.panStory.DragOver += new System.Windows.Forms.DragEventHandler(this.panStory_DragOver);
+            this.panelCentral.AutoScroll = true;
+            this.panelCentral.BackColor = System.Drawing.Color.White;
+            this.panelCentral.Controls.Add(this.storyPad);
+            this.panelCentral.Cursor = System.Windows.Forms.Cursors.Default;
+            this.panelCentral.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelCentral.Location = new System.Drawing.Point(0, 0);
+            this.panelCentral.Name = "panelCentral";
+            this.panelCentral.Size = new System.Drawing.Size(546, 379);
+            this.panelCentral.TabIndex = 0;
+            this.panelCentral.DragDrop += new System.Windows.Forms.DragEventHandler(this.storyPad_DragDrop);
+            this.panelCentral.DragOver += new System.Windows.Forms.DragEventHandler(this.storyPad_DragOver);
             // 
             // storyPad
             // 
             this.storyPad.AllowDrop = true;
+            this.storyPad.BackColor = System.Drawing.SystemColors.Control;
             this.storyPad.Location = new System.Drawing.Point(0, 0);
             this.storyPad.Name = "storyPad";
-            this.storyPad.Size = new System.Drawing.Size(604, 441);
+            this.storyPad.Size = new System.Drawing.Size(482, 308);
             this.storyPad.TabIndex = 0;
             this.storyPad.OnSelected += new System.EventHandler<Stories.Model.RibbonSelectedEventArgs>(this.storyPad_OnSelected);
             this.storyPad.OnChanged += new System.EventHandler<System.EventArgs>(this.storyPad_OnChanged);
+            this.storyPad.DragDrop += new System.Windows.Forms.DragEventHandler(this.storyPad_DragDrop);
+            this.storyPad.DragOver += new System.Windows.Forms.DragEventHandler(this.storyPad_DragOver);
             // 
             // splitContainer2
             // 
@@ -197,7 +202,7 @@ namespace Stories
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.pgStoryElement);
-            this.splitContainer2.Size = new System.Drawing.Size(260, 379);
+            this.splitContainer2.Size = new System.Drawing.Size(252, 379);
             this.splitContainer2.SplitterDistance = 180;
             this.splitContainer2.SplitterWidth = 2;
             this.splitContainer2.TabIndex = 0;
@@ -211,7 +216,7 @@ namespace Stories
             this.tcSelector.Location = new System.Drawing.Point(0, 0);
             this.tcSelector.Name = "tcSelector";
             this.tcSelector.SelectedIndex = 0;
-            this.tcSelector.Size = new System.Drawing.Size(260, 180);
+            this.tcSelector.Size = new System.Drawing.Size(252, 180);
             this.tcSelector.TabIndex = 1;
             // 
             // tabPage1
@@ -220,7 +225,7 @@ namespace Stories
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(252, 152);
+            this.tabPage1.Size = new System.Drawing.Size(244, 152);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Project";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -233,7 +238,7 @@ namespace Stories
             this.tvStory.HideSelection = false;
             this.tvStory.Location = new System.Drawing.Point(3, 3);
             this.tvStory.Name = "tvStory";
-            this.tvStory.Size = new System.Drawing.Size(246, 146);
+            this.tvStory.Size = new System.Drawing.Size(238, 146);
             this.tvStory.TabIndex = 0;
             this.tvStory.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvStory_AfterSelect);
             // 
@@ -243,7 +248,7 @@ namespace Stories
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(252, 152);
+            this.tabPage2.Size = new System.Drawing.Size(244, 152);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Library";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -255,7 +260,7 @@ namespace Stories
             this.tvLibrary.FullRowSelect = true;
             this.tvLibrary.Location = new System.Drawing.Point(3, 3);
             this.tvLibrary.Name = "tvLibrary";
-            this.tvLibrary.Size = new System.Drawing.Size(246, 146);
+            this.tvLibrary.Size = new System.Drawing.Size(238, 146);
             this.tvLibrary.TabIndex = 0;
             this.tvLibrary.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tvLibrary_MouseDown);
             this.tvLibrary.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tvLibrary_MouseMove);
@@ -263,13 +268,29 @@ namespace Stories
             // 
             // pgStoryElement
             // 
+            this.pgStoryElement.ContextMenuStrip = this.contextMenuStripPropertyGrid;
             this.pgStoryElement.Cursor = System.Windows.Forms.Cursors.Default;
             this.pgStoryElement.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgStoryElement.Location = new System.Drawing.Point(0, 0);
             this.pgStoryElement.Name = "pgStoryElement";
-            this.pgStoryElement.Size = new System.Drawing.Size(260, 197);
+            this.pgStoryElement.Size = new System.Drawing.Size(252, 197);
             this.pgStoryElement.TabIndex = 0;
             this.pgStoryElement.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.pgStoryElement_PropertyValueChanged);
+            // 
+            // contextMenuStripPropertyGrid
+            // 
+            this.contextMenuStripPropertyGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resetToolStripMenuItem});
+            this.contextMenuStripPropertyGrid.Name = "contextMenuStripPropertyGrid";
+            this.contextMenuStripPropertyGrid.Size = new System.Drawing.Size(103, 26);
+            this.contextMenuStripPropertyGrid.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStripPropertyGrid_Opening);
+            // 
+            // resetToolStripMenuItem
+            // 
+            this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.resetToolStripMenuItem.Text = "Reset";
+            this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -635,7 +656,7 @@ namespace Stories
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.panStory.ResumeLayout(false);
+            this.panelCentral.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
@@ -643,6 +664,7 @@ namespace Stories
             this.tcSelector.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.contextMenuStripPropertyGrid.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
@@ -697,7 +719,7 @@ namespace Stories
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripButton helpToolStripButton;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Panel panStory;
+        private System.Windows.Forms.Panel panelCentral;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.TreeView tvStory;
         private System.Windows.Forms.PropertyGrid pgStoryElement;
@@ -706,6 +728,8 @@ namespace Stories
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TreeView tvLibrary;
         private Model.StoryPad storyPad;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripPropertyGrid;
+        private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
     }
 }
 

@@ -22,6 +22,7 @@ namespace Stories.Model
         private void Init()
         {
             DoubleBuffered = true;
+            BackColor = SystemColors.Control;
         }
 
         public StoryPad()
@@ -42,7 +43,7 @@ namespace Stories.Model
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            foreach (var control in Elements)
+            foreach (var control in Elements.Where(item => item.Visible))
             {
                 var bounds = control.Bounds;
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
