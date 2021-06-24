@@ -258,6 +258,12 @@ namespace Stories.Model
             selected.AddRange(elements.Where(item => item == element));
             Invalidate();
         }
+
+        public void ClearSelection()
+        {
+            selected.Clear();
+            Invalidate();
+        }
     }
 
     public class RibbonSelectedEventArgs : EventArgs

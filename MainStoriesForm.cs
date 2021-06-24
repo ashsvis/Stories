@@ -194,6 +194,7 @@ namespace Stories
         {
             if (e.Node != null && e.Node.Tag is Control control)
             {
+                storyPad.ClearSelection();
                 // если выбор не пуст, то передаем элемент сетке свойств
                 pgStoryElement.SelectedObject = control;
                 storyPad.Select(control);
@@ -217,10 +218,18 @@ namespace Stories
         {
             var single = e.Selected.FirstOrDefault();
             pgStoryElement.SelectedObject = single;
-            if (single != null)
-                tvStory.SelectedNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(node => node.Tag == single);
-            else
-                tvStory.SelectedNode = null;
+            try
+            {
+                tvStory.AfterSelect -= tvStory_AfterSelect;
+                if (single != null)
+                    tvStory.SelectedNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(node => node.Tag == single);
+                else
+                    tvStory.SelectedNode = null;
+            }
+            finally
+            {
+                tvStory.AfterSelect += tvStory_AfterSelect;
+            }
             pgStoryElement.SelectedObjects = e.Selected.ToArray();
         }
 
@@ -235,7 +244,7 @@ namespace Stories
             if (pgStoryElement.SelectedObjects == null || pgStoryElement.SelectedObjects.Length <= 1)
                 resetToolStripMenuItem.Enabled = item.PropertyDescriptor.CanResetValue(pgStoryElement.SelectedObject);
             else
-                resetToolStripMenuItem.Enabled = false;
+                e.Cancel = true;
         }
 
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
