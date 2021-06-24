@@ -46,7 +46,7 @@ namespace Stories.Services
             }
         }
 
-        public void SaveData(List<Control> controls)
+        public void SaveData(IEnumerable<Control> controls)
         {
             var samples = new Dictionary<Type, object>();
             var content = new List<StoreItem>();

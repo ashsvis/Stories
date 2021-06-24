@@ -11,35 +11,14 @@ namespace Stories
     public partial class MainStoriesForm : Form
     {
         private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContent.bin";
-        private StoryContent storyContent = new StoryContent();
         private FileIOService fileIOService;
-
-        private RectangleRibbonSelector ribbonSelector;
-        private SelectionHolder selHolder;
 
         public MainStoriesForm()
         {
             InitializeComponent();
             StoryLibrary.Init();
-
-            // создаём объект рамки выбора фигур
-            ribbonSelector = new RectangleRibbonSelector(panStory, new Pen(Color.Fuchsia) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot });
-            ribbonSelector.OnSelected += RibbonSelector_OnSelected;
-
-            selHolder = new SelectionHolder(panStory);
-        }
-
-        private void RibbonSelector_OnSelected(object sender, RibbonSelectedEventArgs e)
-        {
-            var rect = e.RectangleSelected;
-            selHolder.Clear();
-            foreach (var control in panStory.Controls.Cast<Control>())
-            {
-                if (Rectangle.Intersect(control.Bounds, rect).IsEmpty) continue;
-                selHolder.Add(control);
-            }
-            pgStoryElement.SelectedObject = null;
-            pgStoryElement.SelectedObjects = selHolder.GetSelected();
+            storyPad.Size = new Size(5000, 5000);
+            panStory.Controls.Add(storyPad);
         }
 
         /// <summary>
@@ -52,15 +31,13 @@ namespace Stories
             fileIOService = new FileIOService(PATH);
             try
             {
-                storyContent.Items = fileIOService.LoadData();
-                panStory.Controls.Clear();
+                storyPad.LoadData(fileIOService.LoadData());
                 tvStory.Nodes.Clear();
-                foreach (var element in storyContent.Items)
+                foreach (var element in storyPad.Elements)
                 {
-                    panStory.Controls.Add(element);
-                    AddEventHandlers(element);
                     tvStory.Nodes.Add(new TreeNode(element.Text) { Tag = element });
                 }
+                storyPad.Invalidate();
             }
             catch (Exception ex)
             {
@@ -141,11 +118,12 @@ namespace Stories
                 // присваиваем видимое тесктовое значение по умолчанию
                 element.Text = typeNode.Text;
                 // располагаем верхний левый угол в точке сбрасывания
-                element.Location = panStory.PointToClient(new Point(e.X, e.Y));
+                element.Location = storyPad.PointToClient(new Point(e.X, e.Y));
                 // добавляем новый контрол в список контролов контейнера
                 panStory.Controls.Add(element);
-                AddEventHandlers(element);
-                storyContent.Items.Add(element);
+                //AddEventHandlers(element);
+                storyPad.Add(element);
+
                 ContentChanged = true;
                 // добавляем новый элемент в дерево проекта
                 var controlNode = new TreeNode(element.Text) { Tag = element };
@@ -158,7 +136,8 @@ namespace Stories
         private void AddEventHandlers(Control element)
         {
             // прицепляем клик на вновь поставленный элемент
-            element.Click += Element_Click;
+            element.MouseDown += Element_MouseDownClick;
+            element.MouseMove += Element_MouseMoveClick;
             if (element is CheckBox checkBox)
                 checkBox.CheckedChanged += ValueChanged_Click;
             if (element is RadioButton radioButton)
@@ -188,26 +167,38 @@ namespace Stories
 
         private void SaveContent()
         {
-            fileIOService.SaveData(storyContent.Items);
+            fileIOService.SaveData(storyPad.Elements);
             ContentChanged = false;
         }
+
+        Point downPoint;
 
         /// <summary>
         /// При клике на выставленном элементе
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Element_Click(object sender, EventArgs e)
+        private void Element_MouseDownClick(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Left)
+                downPoint = e.Location;
             // переключаем вкладку на проект
             tcSelector.SelectedTab = tabPage1;
             // ищем и выделяем узел, привязанный к элементу
             tvStory.SelectedNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(item => item.Tag == sender);
             // передаем его сетке свойств
             pgStoryElement.SelectedObject = sender;
+        }
 
-            selHolder.Clear();
-            selHolder.Add((Control)sender);
+        private void Element_MouseMoveClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && sender is Control control)
+            {
+                var pt = control.Location;
+                pt.Offset(e.Location.X - downPoint.X, e.Location.Y - downPoint.Y);
+                control.Location = pt;
+                downPoint = e.Location;
+            }
         }
 
         /// <summary>
@@ -232,6 +223,7 @@ namespace Stories
         private void pgStoryElement_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             ContentChanged = true;
+            storyPad.Invalidate();
         }
     }
 }
