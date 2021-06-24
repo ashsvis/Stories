@@ -225,5 +225,16 @@ namespace Stories
             ContentChanged = true;
             storyPad.Invalidate();
         }
+
+        private void storyPad_OnSelected(object sender, RibbonSelectedEventArgs e)
+        {
+            pgStoryElement.SelectedObjects = e.Selected.ToArray();
+            var single = e.Selected.FirstOrDefault();
+            pgStoryElement.SelectedObject = single;
+            if (single != null)
+                tvStory.SelectedNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(node => node.Tag == single);
+            else
+                tvStory.SelectedNode = null;
+        }
     }
 }

@@ -75,9 +75,6 @@ namespace Stories.Model
                 ribbonRect = Rectangle.Empty;
                 // запоминаем точку первую точку выбора начала рисования прямоугольника выбора
                 mouseDownLocation = e.Location;
-
-                selected.Clear();
-                Invalidate();
             }
         }
 
@@ -104,40 +101,39 @@ namespace Stories.Model
             base.OnMouseUp(e);
             if (e.Button == MouseButtons.Left)
             {
-                selected.Clear();
                 // инициация события при окончании выбора прямоугольником
                 if (!ribbonRect.IsEmpty)
                 {
+                    selected.Clear();
                     foreach (var control in elements)
                     {
-                        //if (Rectangle.Intersect(control.Bounds, ribbonRect).IsEmpty) continue;
-                        if (Rectangle.Intersect(control.Bounds, ribbonRect) != control.Bounds) continue;
+                        if (Rectangle.Intersect(control.Bounds, ribbonRect).IsEmpty) continue;
+                        //if (Rectangle.Intersect(control.Bounds, ribbonRect) != control.Bounds) continue;
                         selected.Add(control);
                     }
-
-                    // создаём объект аргумента для возбуждения события
-                    RibbonSelectedEventArgs args = new()
-                    {
-                        // и передаём выбранный прямоугольник
-                        RectangleSelected = ribbonRect
-                    };
                     // возбуждаем событие окончания выбора
-                    OnRibbonSelected(args);
+                    OnRibbonSelected(new(ribbonRect, selected));
+                    Invalidate();
                     // обнуление прямоугольника выбора
                     ribbonRect = Rectangle.Empty;
+                    return;
                 }
                 else
                 {
+                    selected.Clear();
                     foreach (var control in elements)
                     {
                         if (control.Bounds.Contains(e.Location))
                         {
                             selected.Add(control);
-                            break;
+                            // возбуждаем событие окончания выбора
+                            OnRibbonSelected(new(ribbonRect, selected));
+                            Invalidate();
+                            return;
                         }
                     }
                 }
-                // запрашиваем, чтобы обновился
+                OnRibbonSelected(new(ribbonRect, selected));
                 Invalidate();
             }
         }
@@ -170,6 +166,13 @@ namespace Stories.Model
 
     public class RibbonSelectedEventArgs : EventArgs
     {
-        public Rectangle RectangleSelected { get; set; }
+        public RibbonSelectedEventArgs(Rectangle rectangleSelected, IEnumerable<object> selected)
+        {
+            RectangleSelected = rectangleSelected;
+            Selected = selected;
+        }
+
+        public Rectangle RectangleSelected { get; private set; }
+        public IEnumerable<object> Selected { get; private set; }
     }
 }
