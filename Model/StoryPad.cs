@@ -13,6 +13,7 @@ namespace Stories.Model
         private Point mouseDownLocation;
         private readonly List<Control> elements = new();
         private readonly List<Control> selected = new();
+        private bool dragMode = false;
 
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
 
@@ -56,7 +57,7 @@ namespace Stories.Model
                 e.Graphics.DrawRectangle(Pens.Fuchsia, rect);
             }
             // если прямоугольник выбора не пуст
-            if (!ribbonRect.IsEmpty)
+            if (!ribbonRect.IsEmpty && !dragMode)
             {
                 // рисуем рамку прямоугольника выбора
                 using var pen = new Pen(Color.Fuchsia) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
@@ -67,6 +68,7 @@ namespace Stories.Model
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
+            dragMode = false;
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
             {
@@ -78,7 +80,11 @@ namespace Stories.Model
                 foreach (var control in elements)
                 {
                     if (control.Bounds.Contains(e.Location) && selected.Contains(control))
+                    {
+                        // под курсором есть выбранные элементы
+                        dragMode = true;
                         return;
+                    }
                 }
 
                 selected.Clear();
@@ -110,37 +116,40 @@ namespace Stories.Model
             base.OnMouseUp(e);
             if (e.Button == MouseButtons.Left)
             {
-                selected.Clear();
-                // инициация события при окончании выбора прямоугольником
-                if (!ribbonRect.IsEmpty)
+                if (!dragMode)
                 {
-                    foreach (var control in elements)
+                    selected.Clear();
+                    // инициация события при окончании выбора прямоугольником
+                    if (!ribbonRect.IsEmpty)
                     {
-                        if (Rectangle.Intersect(control.Bounds, ribbonRect).IsEmpty) continue;
-                        selected.Add(control);
-                    }
-                    // возбуждаем событие окончания выбора
-                    OnRibbonSelected(new(ribbonRect, selected));
-                    Invalidate();
-                    // обнуление прямоугольника выбора
-                    ribbonRect = Rectangle.Empty;
-                    return;
-                }
-                else
-                {
-                    foreach (var control in elements)
-                    {
-                        if (control.Bounds.Contains(e.Location))
+                        foreach (var control in elements)
                         {
+                            if (Rectangle.Intersect(control.Bounds, ribbonRect).IsEmpty) continue;
                             selected.Add(control);
-                            // возбуждаем событие окончания выбора
-                            OnRibbonSelected(new(ribbonRect, selected));
-                            Invalidate();
-                            return;
+                        }
+                        // возбуждаем событие окончания выбора
+                        OnRibbonSelected(new(ribbonRect, selected));
+                        Invalidate();
+                        // обнуление прямоугольника выбора
+                        ribbonRect = Rectangle.Empty;
+                        return;
+                    }
+                    else
+                    {
+                        foreach (var control in elements)
+                        {
+                            if (control.Bounds.Contains(e.Location))
+                            {
+                                selected.Add(control);
+                                // возбуждаем событие окончания выбора
+                                OnRibbonSelected(new(ribbonRect, selected));
+                                Invalidate();
+                                return;
+                            }
                         }
                     }
+                    OnRibbonSelected(new(ribbonRect, selected));
                 }
-                OnRibbonSelected(new(ribbonRect, selected));
                 Invalidate();
             }
         }
