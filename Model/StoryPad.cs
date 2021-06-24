@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Stories.Model
@@ -41,11 +42,9 @@ namespace Stories.Model
             foreach (var control in Elements)
             {
                 var bounds = control.Bounds;
-                using (var bmp = new Bitmap(bounds.Width, bounds.Height))
-                {
-                    control.DrawToBitmap(bmp, control.ClientRectangle);
-                    e.Graphics.DrawImage(bmp, bounds);
-                }
+                using var bmp = new Bitmap(bounds.Width, bounds.Height);
+                control.DrawToBitmap(bmp, control.ClientRectangle);
+                e.Graphics.DrawImage(bmp, bounds);
             }
             // рисуем рамки для выбранных элементов
             foreach (var control in selected)
@@ -75,6 +74,16 @@ namespace Stories.Model
                 ribbonRect = Rectangle.Empty;
                 // запоминаем точку первую точку выбора начала рисования прямоугольника выбора
                 mouseDownLocation = e.Location;
+
+                foreach (var control in elements)
+                {
+                    if (control.Bounds.Contains(e.Location) && selected.Contains(control))
+                        return;
+                }
+
+                selected.Clear();
+                // запрашиваем, чтобы обновился
+                Invalidate();
             }
         }
 
@@ -101,14 +110,13 @@ namespace Stories.Model
             base.OnMouseUp(e);
             if (e.Button == MouseButtons.Left)
             {
+                selected.Clear();
                 // инициация события при окончании выбора прямоугольником
                 if (!ribbonRect.IsEmpty)
                 {
-                    selected.Clear();
                     foreach (var control in elements)
                     {
                         if (Rectangle.Intersect(control.Bounds, ribbonRect).IsEmpty) continue;
-                        //if (Rectangle.Intersect(control.Bounds, ribbonRect) != control.Bounds) continue;
                         selected.Add(control);
                     }
                     // возбуждаем событие окончания выбора
@@ -120,7 +128,6 @@ namespace Stories.Model
                 }
                 else
                 {
-                    selected.Clear();
                     foreach (var control in elements)
                     {
                         if (control.Bounds.Contains(e.Location))
@@ -160,6 +167,14 @@ namespace Stories.Model
         public void Remove(Control element)
         {
             elements.Remove(element);
+            Invalidate();
+        }
+
+        public void Select(Control element)
+        {
+            if (selected.Contains(element)) return;
+            selected.Clear();
+            selected.AddRange(elements.Where(item => item == element));
             Invalidate();
         }
     }

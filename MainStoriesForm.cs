@@ -208,9 +208,12 @@ namespace Stories
         /// <param name="e"></param>
         private void tvStory_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node != null)
+            if (e.Node != null && e.Node.Tag is Control control)
+            {
                 // если выбор не пуст, то передаем элемент сетке свойств
-                pgStoryElement.SelectedObject = e.Node.Tag;
+                pgStoryElement.SelectedObject = control;
+                storyPad.Select(control);
+            }
             else
                 pgStoryElement.SelectedObject = null;
         }
