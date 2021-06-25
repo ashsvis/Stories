@@ -156,6 +156,20 @@ namespace Stories.Model
 
                 delta = new Point(e.X - mouseDownLocation.X, e.Y - mouseDownLocation.Y);
 
+                // защиты по перемещению
+                if (selected.Count > 0)
+                {
+                    var rect = selected.First().Bounds;
+                    selected.ForEach(control => { rect = Rectangle.Union(rect, control.Bounds); });
+                    rect.Offset(delta);
+                    // защита по левой и верхней сторонам
+                    if (rect.Left < 0) delta.X += -rect.Left;
+                    if (rect.Top < 0) delta.Y += -rect.Top;
+                    // защита по правой и нижней сторонам
+                    if (rect.Left + rect.Width > this.Width) delta.X -= rect.Left + rect.Width - this.Width;
+                    if (rect.Top + rect.Height > this.Height) delta.X -= rect.Top + rect.Height - this.Height;
+                }
+
                 // запрашиваем, чтобы обновился
                 Invalidate();
             }
