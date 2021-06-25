@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Stories.Services
 {
@@ -6,7 +7,7 @@ namespace Stories.Services
     public class StoreItem
     {
         public string Type { get; set; }
-        public StoreProp[] Props { get; set; } = new StoreProp[] { };
+        public List<StoreProp> Props { get; set; } = new();
     }
 
     [Serializable]
@@ -14,5 +15,10 @@ namespace Stories.Services
     {
         public string Name { get; set; }
         public object Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}={Value}";
+        }
     }
 }

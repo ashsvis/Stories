@@ -69,17 +69,19 @@ namespace Stories.Services
                 {
                     // получаем ссылку на свойство по его имени
                     var prop = type.GetProperty(info.Name);
-                    if (!prop.CanWrite || !prop.CanRead) continue;
+                    var propType = prop.PropertyType;
+
+                    if (!prop.CanWrite || !prop.CanRead || !propType.IsSerializable) continue;
+
                     var propName = prop.Name;
-                    if (propName == "Left" || propName == "Top" || propName == "Location" ||
-                        propName == "Parent" || propName == "BindingContext" || propName == "Cursor") continue;
                     var propValue = prop.GetValue(control);
                     var propValueSample = prop.GetValue(sample);
                     if ($"{propValue}" == $"{propValueSample}") continue;
                     storeProps.Add(new StoreProp() { Name = propName, Value = propValue });
                 }
-                storeItem.Props = storeProps.ToArray();
+                storeItem.Props = storeProps;
             }
+
             using (var fs = File.Create(PATH))
             using (var zip = new GZipStream(fs, CompressionMode.Compress))
             {
