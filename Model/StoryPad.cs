@@ -167,7 +167,7 @@ namespace Stories.Model
                     if (rect.Top < 0) delta.Y += -rect.Top;
                     // защита по правой и нижней сторонам
                     if (rect.Left + rect.Width > this.Width) delta.X -= rect.Left + rect.Width - this.Width;
-                    if (rect.Top + rect.Height > this.Height) delta.X -= rect.Top + rect.Height - this.Height;
+                    if (rect.Top + rect.Height > this.Height) delta.Y -= rect.Top + rect.Height - this.Height;
                 }
 
                 // запрашиваем, чтобы обновился
