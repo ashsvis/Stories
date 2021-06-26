@@ -121,17 +121,25 @@ namespace Stories.Model
                 mouseDownLocation = e.Location;
 
                 // проверка, если есть под курсором уже выбранные, тогда добавляем прямоугольники в список для перетаскивания
-                foreach (var control in elements)
+                foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location) && selected.Contains(item)))
                 {
-                    if (control.Bounds.Contains(e.Location) && selected.Contains(control))
-                    {
-                        // под курсором есть выбранные элементы
-                        dragMode = true;
-                        dragRects.AddRange(selected.Select(item => item.Bounds));
-                        return;
-                    }
+                    // под курсором есть выбранные элементы
+                    dragMode = true;
+                    dragRects.AddRange(selected.Select(item => item.Bounds));
+                    return;
                 }
 
+                // проверка, если есть под курсором нет выбранных, тогдаочищаем список выбранных и добавляем в список выбора и прямоугольники в список для перетаскивания
+                foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location)))
+                {
+                    selected.Clear();
+                    selected.Add(control);
+                    dragMode = true;
+                    dragRects.AddRange(selected.Select(item => item.Bounds));
+                    return;
+                }
+
+                // если вообще пусто под курсором
                 selected.Clear();
                 // запрашиваем, чтобы обновился
                 Invalidate();
@@ -200,16 +208,13 @@ namespace Stories.Model
                     }
                     else
                     {
-                        foreach (var control in elements)
+                        foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location)))
                         {
-                            if (control.Bounds.Contains(e.Location))
-                            {
-                                selected.Add(control);
-                                // возбуждаем событие окончания выбора
-                                OnRibbonSelected(new(ribbonRect, selected));
-                                Invalidate();
-                                return;
-                            }
+                            selected.Add(control);
+                            // возбуждаем событие окончания выбора
+                            OnRibbonSelected(new(ribbonRect, selected));
+                            Invalidate();
+                            return;
                         }
                     }
                     OnRibbonSelected(new(ribbonRect, selected));
