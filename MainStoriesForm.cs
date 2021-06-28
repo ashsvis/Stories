@@ -239,7 +239,8 @@ namespace Stories
             toolStripButtonAlignCenters.Enabled = 
             toolStripButtonAlignRights.Enabled = e.Selected.Count() > 1;
             toolStripButtonAlignTops.Enabled = 
-            toolStripButtonAlignMiddles.Enabled = e.Selected.Count() > 1;
+            toolStripButtonAlignMiddles.Enabled =
+            toolStripButtonAlignBottoms.Enabled = e.Selected.Count() > 1;
         }
 
         private void storyPad_OnChanged(object sender, EventArgs e)
@@ -313,6 +314,16 @@ namespace Stories
             var middle = first.Top + first.Height / 2;
             foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
                 control.Top = middle - control.Height / 2;
+            ContentChanged = true;
+            storyPad.Invalidate();
+        }
+
+        private void toolStripButtonAlignBottoms_Click(object sender, EventArgs e)
+        {
+            var first = (Control)pgStoryElement.SelectedObjects.First();
+            var bottom = first.Top + first.Height;
+            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
+                control.Top = bottom - control.Height;
             ContentChanged = true;
             storyPad.Invalidate();
         }

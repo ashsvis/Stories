@@ -118,19 +118,22 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="AlignLefts" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AlignLefts.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="AlignRights" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AlignRights.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="AlignCenters" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AlignCenters.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AlignMiddles" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AlignMiddles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="AlignTops" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AlignTops.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AlignLefts" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AlignLefts.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AlignMiddles" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AlignMiddles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="AlignBottoms" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AlignBottoms.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
