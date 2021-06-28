@@ -272,60 +272,32 @@ namespace Stories
 
         private void toolStripButtonAlignLefts_Click(object sender, EventArgs e)
         {
-            var left = ((Control)pgStoryElement.SelectedObjects.First()).Left;
-            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
-                control.Left = left;
-            ContentChanged = true;
-            storyPad.Invalidate();
+            storyPad.SelectedAlignLefts();
         }
 
         private void toolStripButtonAlignCenters_Click(object sender, EventArgs e)
         {
-            var first = (Control)pgStoryElement.SelectedObjects.First();
-            var center = first.Left + first.Width / 2;
-            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
-                control.Left = center - control.Width / 2;
-            ContentChanged = true;
-            storyPad.Invalidate();
+            storyPad.SelectedAlignCenters();
         }
 
         private void toolStripButtonAlignRights_Click(object sender, EventArgs e)
         {
-            var first = (Control)pgStoryElement.SelectedObjects.First();
-            var right = first.Left + first.Width;
-            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
-                control.Left = right - control.Width;
-            ContentChanged = true;
-            storyPad.Invalidate();
+            storyPad.SelectedAlignRights();
         }
 
         private void toolStripButtonAlignTops_Click(object sender, EventArgs e)
         {
-            var top = ((Control)pgStoryElement.SelectedObjects.First()).Top;
-            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
-                control.Top = top;
-            ContentChanged = true;
-            storyPad.Invalidate();
+            storyPad.SelectedAlignTops();
         }
 
         private void toolStripButtonAlignMiddles_Click(object sender, EventArgs e)
         {
-            var first = (Control)pgStoryElement.SelectedObjects.First();
-            var middle = first.Top + first.Height / 2;
-            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
-                control.Top = middle - control.Height / 2;
-            ContentChanged = true;
-            storyPad.Invalidate();
+            storyPad.SelectedAlignMiddles();
         }
 
         private void toolStripButtonAlignBottoms_Click(object sender, EventArgs e)
         {
-            var first = (Control)pgStoryElement.SelectedObjects.First();
-            var bottom = first.Top + first.Height;
-            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
-                control.Top = bottom - control.Height;
-            ContentChanged = true;
-            storyPad.Invalidate();
+            storyPad.SelectedAlignBottoms();
         }
     }
 }

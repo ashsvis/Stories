@@ -291,6 +291,71 @@ namespace Stories.Model
             selected.Clear();
             Invalidate();
         }
+
+        public void SelectedAlignLefts()
+        {
+            if (selected.Count < 2) return;
+            var left = selected.First().Left;
+            foreach (var control in selected)
+                control.Left = left;
+            Invalidate();
+            OnElementsChanged();
+        }
+
+        public void SelectedAlignCenters()
+        {
+            if (selected.Count < 2) return;
+            var first = selected.First();
+            var center = first.Left + first.Width / 2;
+            foreach (var control in selected)
+                control.Left = center - control.Width / 2;
+            Invalidate();
+            OnElementsChanged();
+        }
+
+        public void SelectedAlignRights()
+        {
+            if (selected.Count < 2) return;
+            var first = selected.First();
+            var right = first.Left + first.Width;
+            foreach (var control in selected)
+                control.Left = right - control.Width;
+            Invalidate();
+            OnElementsChanged();
+        }
+
+        public void SelectedAlignTops()
+        {
+            if (selected.Count < 2) return;
+            var top = selected.First().Top;
+            foreach (var control in selected)
+                control.Top = top;
+            Invalidate();
+            OnElementsChanged();
+        }
+
+        public void SelectedAlignMiddles()
+        {
+            if (selected.Count < 2) return;
+            var first = selected.First();
+            var middle = first.Top + first.Height / 2;
+            foreach (var control in selected)
+                control.Top = middle - control.Height / 2;
+            Invalidate();
+            OnElementsChanged();
+        }
+
+        public void SelectedAlignBottoms()
+        {
+            if (selected.Count < 2) return;
+            var first = selected.First();
+            var bottom = first.Top + first.Height;
+            foreach (var control in selected)
+                control.Top = bottom - control.Height;
+            Invalidate();
+            OnElementsChanged();
+        }
+
     }
 
     public class RibbonSelectedEventArgs : EventArgs
