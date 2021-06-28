@@ -17,7 +17,7 @@ namespace Stories
         {
             InitializeComponent();
             StoryLibrary.Init();
-            storyPad.Size = new Size(5000, 5000);
+            storyPad.Size = new Size(3000, 3000);
             panelCentral.Controls.Add(storyPad);
 
             //storyPad.OnClick += (o, e) => { Text = $"{e.Location}"; };

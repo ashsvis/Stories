@@ -46,47 +46,77 @@ namespace Stories.Model
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            foreach (var control in Elements.Where(item => item.Visible).Reverse())
+            foreach (var control in elements.Where(item => item.Visible && (!dragMode || dragMode && !selected.Contains(item))).Reverse())
             {
                 var bounds = control.Bounds;
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 control.DrawToBitmap(bmp, control.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);
-                if (control is PictureBox pBox)
-                {
-                    if (pBox.Image == null)
-                        using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                            e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
-                }
-                if (control is Label label)
-                {
-                    if (string.IsNullOrWhiteSpace(label.Text) && label.BorderStyle == BorderStyle.None)
-                        using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                            e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
-                }
+                DrawSpecifics(e, control, bounds);
                 if (selected.Contains(control) && !dragMode)
-                {
-                    Rectangle rect = CorrectRect(control);
-                    //rect.Inflate(1, 1);
-                    e.Graphics.DrawRectangle(Pens.Fuchsia, rect);
-                }
+                    DrawMarkers(e.Graphics, control);
             }
             // если прямоугольник выбора не пуст
             if (!ribbonRect.IsEmpty && !dragMode)
             {
                 // рисуем рамку прямоугольника выбора
-                using var pen = new Pen(Color.Fuchsia) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
+                using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
                 e.Graphics.DrawRectangle(pen, ribbonRect);
             }
-            // в режиме перетаскивания рисуем прямоугольники со смещением delta
+            // в режиме перетаскивания рисуем со смещением delta
             if (dragMode)
             {
-                foreach (var rect in dragRects)
+                foreach (var control in selected)
                 {
-                    var r = rect;
+                    var r = control.Bounds;
                     r.Offset(delta);
-                    e.Graphics.DrawRectangle(Pens.Fuchsia, r);
+                    using var bmp = new Bitmap(r.Width, r.Height);
+                    control.DrawToBitmap(bmp, control.ClientRectangle);
+                    e.Graphics.DrawImage(bmp, r);
+                    DrawSpecifics(e, control, r);
+                    using (var pen = new Pen(Color.Gray, 2f))
+                        e.Graphics.DrawRectangle(pen, r);
                 }
+            }
+        }
+
+        private void DrawMarkers(Graphics graphics, Control control)
+        {
+            Rectangle rect = CorrectRect(control);
+            //graphics.DrawRectangle(Pens.Fuchsia, rect);
+            rect.Inflate(3, 3);
+            using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
+            graphics.DrawRectangle(pen, rect);
+            rect.Inflate(3, 3);
+            var size = new Size(6, 6);
+            var list = new Rectangle[]
+            {
+                new Rectangle(rect.Location,size),
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y), size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y), size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + (rect.Height - size.Height) / 2), size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + rect.Height - size.Height), size),
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height), size),
+                new Rectangle(new Point(rect.X, rect.Y + rect.Height - size.Height), size),
+                new Rectangle(new Point(rect.X, rect.Y + (rect.Height - size.Height) / 2), size),
+            };
+            graphics.FillRectangles(Brushes.White, list);
+            graphics.DrawRectangles(Pens.Black, list);
+        }
+
+        private static void DrawSpecifics(PaintEventArgs e, Control control, Rectangle bounds)
+        {
+            if (control is PictureBox pBox)
+            {
+                if (pBox.Image == null)
+                    using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
+                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
+            }
+            if (control is Label label)
+            {
+                if (string.IsNullOrWhiteSpace(label.Text) && label.BorderStyle == BorderStyle.None)
+                    using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
+                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
             }
         }
 
