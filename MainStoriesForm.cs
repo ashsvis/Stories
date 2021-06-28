@@ -19,6 +19,8 @@ namespace Stories
             StoryLibrary.Init();
             storyPad.Size = new Size(5000, 5000);
             panelCentral.Controls.Add(storyPad);
+
+            //storyPad.OnClick += (o, e) => { Text = $"{e.Location}"; };
         }
 
         /// <summary>
@@ -232,6 +234,10 @@ namespace Stories
                 tvStory.AfterSelect += tvStory_AfterSelect;
             }
             pgStoryElement.SelectedObjects = e.Selected.ToArray();
+
+            toolStripButtonAlignLefts.Enabled = e.Selected.Count() > 1;
+            toolStripButtonAlignCenters.Enabled = e.Selected.Count() > 1;
+            toolStripButtonAlignRights.Enabled = e.Selected.Count() > 1;
         }
 
         private void storyPad_OnChanged(object sender, EventArgs e)
@@ -259,6 +265,35 @@ namespace Stories
                 ContentChanged = true;
                 storyPad.Invalidate();
             }
+        }
+
+        private void toolStripButtonAlignLefts_Click(object sender, EventArgs e)
+        {
+            var left = ((Control)pgStoryElement.SelectedObjects.First()).Left;
+            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
+                control.Left = left;
+            ContentChanged = true;
+            storyPad.Invalidate();
+        }
+
+        private void toolStripButtonAlignCenters_Click(object sender, EventArgs e)
+        {
+            var first = (Control)pgStoryElement.SelectedObjects.First();
+            var center = first.Left + first.Width / 2;
+            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
+                control.Left = center - control.Width / 2;
+            ContentChanged = true;
+            storyPad.Invalidate();
+        }
+
+        private void toolStripButtonAlignRights_Click(object sender, EventArgs e)
+        {
+            var first = (Control)pgStoryElement.SelectedObjects.First();
+            var right = first.Left + first.Width;
+            foreach (var control in pgStoryElement.SelectedObjects.OfType<Control>())
+                control.Left = right - control.Width;
+            ContentChanged = true;
+            storyPad.Invalidate();
         }
     }
 }

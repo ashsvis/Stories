@@ -19,6 +19,9 @@ namespace Stories.Model
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
         public event EventHandler<EventArgs> OnChanged;
 
+        public event EventHandler<MouseEventArgs> OnElementClick;
+
+
         private void Init()
         {
             DoubleBuffered = true;
@@ -120,6 +123,8 @@ namespace Stories.Model
                 // запоминаем точку первую точку выбора начала рисования прямоугольника выбора
                 mouseDownLocation = e.Location;
 
+                OnElementMouseClick(e);
+
                 // проверка, если есть под курсором уже выбранные, тогда добавляем прямоугольники в список для перетаскивания
                 foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location) && selected.Contains(item)))
                 {
@@ -219,7 +224,7 @@ namespace Stories.Model
                     }
                     OnRibbonSelected(new(ribbonRect, selected));
                 }
-                else
+                else if (!delta.IsEmpty)
                 {
                     // был режим перетаскивания
                     for (var i = 0; i < dragRects.Count; i++)
@@ -230,6 +235,7 @@ namespace Stories.Model
                         pt.Offset(delta);
                         element.Location = pt;
                     }
+                    delta = Point.Empty;
                     ribbonRect = Rectangle.Empty;
                     dragMode = false;
                     dragRects.Clear();
@@ -249,6 +255,11 @@ namespace Stories.Model
         {
             // если на событие подписались, то вызываем его
             OnChanged?.Invoke(this, e ?? new());
+        }
+
+        protected virtual void OnElementMouseClick(MouseEventArgs e)
+        {
+            OnElementClick?.Invoke(this, e);
         }
 
         public void LoadData(IEnumerable<Control> controls)

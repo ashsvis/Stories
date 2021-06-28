@@ -31,7 +31,6 @@ namespace Stories
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainStoriesForm));
-            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.panelCentral = new System.Windows.Forms.Panel();
@@ -88,10 +87,10 @@ namespace Stories
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonAlignLefts = new System.Windows.Forms.ToolStripButton();
-            this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
-            this.toolStripContainer1.ContentPanel.SuspendLayout();
-            this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
-            this.toolStripContainer1.SuspendLayout();
+            this.toolStripButtonAlignCenters = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButtonAlignRights = new System.Windows.Forms.ToolStripButton();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -108,36 +107,13 @@ namespace Stories
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // toolStripContainer1
-            // 
-            // 
-            // toolStripContainer1.BottomToolStripPanel
-            // 
-            this.toolStripContainer1.BottomToolStripPanel.Controls.Add(this.statusStrip1);
-            // 
-            // toolStripContainer1.ContentPanel
-            // 
-            this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(800, 379);
-            this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
-            this.toolStripContainer1.Name = "toolStripContainer1";
-            this.toolStripContainer1.Size = new System.Drawing.Size(800, 450);
-            this.toolStripContainer1.TabIndex = 0;
-            this.toolStripContainer1.Text = "toolStripContainer1";
-            // 
-            // toolStripContainer1.TopToolStripPanel
-            // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.menuStrip1);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip2);
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.statusStrip1.Location = new System.Drawing.Point(0, 0);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(800, 22);
             this.statusStrip1.TabIndex = 0;
@@ -148,7 +124,7 @@ namespace Stories
             this.splitContainer1.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Location = new System.Drawing.Point(3, 52);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -158,8 +134,8 @@ namespace Stories
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(800, 379);
-            this.splitContainer1.SplitterDistance = 550;
+            this.splitContainer1.Size = new System.Drawing.Size(794, 373);
+            this.splitContainer1.SplitterDistance = 560;
             this.splitContainer1.SplitterWidth = 2;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -172,7 +148,7 @@ namespace Stories
             this.panelCentral.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelCentral.Location = new System.Drawing.Point(0, 0);
             this.panelCentral.Name = "panelCentral";
-            this.panelCentral.Size = new System.Drawing.Size(550, 379);
+            this.panelCentral.Size = new System.Drawing.Size(560, 373);
             this.panelCentral.TabIndex = 0;
             this.panelCentral.DragDrop += new System.Windows.Forms.DragEventHandler(this.storyPad_DragDrop);
             this.panelCentral.DragOver += new System.Windows.Forms.DragEventHandler(this.storyPad_DragOver);
@@ -206,8 +182,8 @@ namespace Stories
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.pgStoryElement);
-            this.splitContainer2.Size = new System.Drawing.Size(248, 379);
-            this.splitContainer2.SplitterDistance = 180;
+            this.splitContainer2.Size = new System.Drawing.Size(232, 373);
+            this.splitContainer2.SplitterDistance = 175;
             this.splitContainer2.SplitterWidth = 2;
             this.splitContainer2.TabIndex = 0;
             // 
@@ -220,7 +196,7 @@ namespace Stories
             this.tcSelector.Location = new System.Drawing.Point(0, 0);
             this.tcSelector.Name = "tcSelector";
             this.tcSelector.SelectedIndex = 0;
-            this.tcSelector.Size = new System.Drawing.Size(248, 180);
+            this.tcSelector.Size = new System.Drawing.Size(232, 175);
             this.tcSelector.TabIndex = 1;
             // 
             // tabPage1
@@ -229,7 +205,7 @@ namespace Stories
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(240, 152);
+            this.tabPage1.Size = new System.Drawing.Size(224, 147);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Project";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -242,7 +218,7 @@ namespace Stories
             this.tvStory.HideSelection = false;
             this.tvStory.Location = new System.Drawing.Point(3, 3);
             this.tvStory.Name = "tvStory";
-            this.tvStory.Size = new System.Drawing.Size(234, 146);
+            this.tvStory.Size = new System.Drawing.Size(218, 141);
             this.tvStory.TabIndex = 0;
             this.tvStory.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvStory_AfterSelect);
             // 
@@ -252,7 +228,7 @@ namespace Stories
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(240, 140);
+            this.tabPage2.Size = new System.Drawing.Size(224, 147);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Library";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -264,7 +240,7 @@ namespace Stories
             this.tvLibrary.FullRowSelect = true;
             this.tvLibrary.Location = new System.Drawing.Point(3, 3);
             this.tvLibrary.Name = "tvLibrary";
-            this.tvLibrary.Size = new System.Drawing.Size(234, 134);
+            this.tvLibrary.Size = new System.Drawing.Size(218, 141);
             this.tvLibrary.TabIndex = 0;
             this.tvLibrary.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tvLibrary_MouseDown);
             this.tvLibrary.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tvLibrary_MouseMove);
@@ -277,7 +253,7 @@ namespace Stories
             this.pgStoryElement.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgStoryElement.Location = new System.Drawing.Point(0, 0);
             this.pgStoryElement.Name = "pgStoryElement";
-            this.pgStoryElement.Size = new System.Drawing.Size(248, 197);
+            this.pgStoryElement.Size = new System.Drawing.Size(232, 196);
             this.pgStoryElement.TabIndex = 0;
             this.pgStoryElement.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.pgStoryElement_PropertyValueChanged);
             // 
@@ -298,7 +274,6 @@ namespace Stories
             // 
             // menuStrip1
             // 
-            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
@@ -549,7 +524,7 @@ namespace Stories
             this.pasteToolStripButton,
             this.toolStripSeparator7,
             this.helpToolStripButton});
-            this.toolStrip1.Location = new System.Drawing.Point(3, 24);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(208, 25);
             this.toolStrip1.TabIndex = 1;
@@ -645,10 +620,12 @@ namespace Stories
             // 
             this.toolStrip2.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButtonAlignLefts});
-            this.toolStrip2.Location = new System.Drawing.Point(211, 24);
+            this.toolStripButtonAlignLefts,
+            this.toolStripButtonAlignCenters,
+            this.toolStripButtonAlignRights});
+            this.toolStrip2.Location = new System.Drawing.Point(208, 0);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(66, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(112, 25);
             this.toolStrip2.TabIndex = 2;
             // 
             // toolStripButtonAlignLefts
@@ -660,25 +637,72 @@ namespace Stories
             this.toolStripButtonAlignLefts.Name = "toolStripButtonAlignLefts";
             this.toolStripButtonAlignLefts.Size = new System.Drawing.Size(23, 22);
             this.toolStripButtonAlignLefts.Text = "Align Lefts";
+            this.toolStripButtonAlignLefts.Click += new System.EventHandler(this.toolStripButtonAlignLefts_Click);
+            // 
+            // toolStripButtonAlignCenters
+            // 
+            this.toolStripButtonAlignCenters.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButtonAlignCenters.Enabled = false;
+            this.toolStripButtonAlignCenters.Image = global::Stories.Properties.Resources.AlignCenters;
+            this.toolStripButtonAlignCenters.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonAlignCenters.Name = "toolStripButtonAlignCenters";
+            this.toolStripButtonAlignCenters.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButtonAlignCenters.Text = "Align Centers";
+            this.toolStripButtonAlignCenters.Click += new System.EventHandler(this.toolStripButtonAlignCenters_Click);
+            // 
+            // toolStripButtonAlignRights
+            // 
+            this.toolStripButtonAlignRights.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButtonAlignRights.Enabled = false;
+            this.toolStripButtonAlignRights.Image = global::Stories.Properties.Resources.AlignRights;
+            this.toolStripButtonAlignRights.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonAlignRights.Name = "toolStripButtonAlignRights";
+            this.toolStripButtonAlignRights.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButtonAlignRights.Text = "Align Rights";
+            this.toolStripButtonAlignRights.Click += new System.EventHandler(this.toolStripButtonAlignRights_Click);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.splitContainer1, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.menuStrip1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 450);
+            this.tableLayoutPanel1.TabIndex = 1;
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.AutoSize = true;
+            this.flowLayoutPanel1.Controls.Add(this.toolStrip1);
+            this.flowLayoutPanel1.Controls.Add(this.toolStrip2);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 24);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(800, 25);
+            this.flowLayoutPanel1.TabIndex = 0;
             // 
             // MainStoriesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.toolStripContainer1);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainStoriesForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultBounds;
             this.Text = "Stories";
             this.Load += new System.EventHandler(this.MainStoriesForm_Load);
-            this.toolStripContainer1.BottomToolStripPanel.ResumeLayout(false);
-            this.toolStripContainer1.BottomToolStripPanel.PerformLayout();
-            this.toolStripContainer1.ContentPanel.ResumeLayout(false);
-            this.toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
-            this.toolStripContainer1.TopToolStripPanel.PerformLayout();
-            this.toolStripContainer1.ResumeLayout(false);
-            this.toolStripContainer1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -698,13 +722,15 @@ namespace Stories
             this.toolStrip1.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
+            this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
@@ -761,6 +787,10 @@ namespace Stories
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripButton toolStripButtonAlignLefts;
+        private System.Windows.Forms.ToolStripButton toolStripButtonAlignCenters;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.ToolStripButton toolStripButtonAlignRights;
     }
 }
 
