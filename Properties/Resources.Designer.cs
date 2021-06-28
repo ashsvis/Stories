@@ -83,9 +83,29 @@ namespace Stories.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AlignMiddles {
+            get {
+                object obj = ResourceManager.GetObject("AlignMiddles", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AlignRights {
             get {
                 object obj = ResourceManager.GetObject("AlignRights", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap AlignTops {
+            get {
+                object obj = ResourceManager.GetObject("AlignTops", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

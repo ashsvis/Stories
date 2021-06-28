@@ -46,7 +46,7 @@ namespace Stories.Model
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            foreach (var control in Elements.Where(item => item.Visible))
+            foreach (var control in Elements.Where(item => item.Visible).Reverse())
             {
                 var bounds = control.Bounds;
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
@@ -64,14 +64,10 @@ namespace Stories.Model
                         using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
                             e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
                 }
-            }
-            if (!dragMode)
-            {
-                // рисуем рамки для выбранных элементов
-                foreach (var control in selected)
+                if (selected.Contains(control) && !dragMode)
                 {
                     Rectangle rect = CorrectRect(control);
-                    rect.Inflate(1, 1);
+                    //rect.Inflate(1, 1);
                     e.Graphics.DrawRectangle(Pens.Fuchsia, rect);
                 }
             }
@@ -206,9 +202,6 @@ namespace Stories.Model
                         }
                         // возбуждаем событие окончания выбора
                         OnRibbonSelected(new(ribbonRect, selected));
-                        //Invalidate();
-                        // обнуление прямоугольника выбора
-                        ribbonRect = Rectangle.Empty;
                         goto exit;
                     }
                     else
@@ -218,16 +211,13 @@ namespace Stories.Model
                             selected.Add(control);
                             // возбуждаем событие окончания выбора
                             OnRibbonSelected(new(ribbonRect, selected));
-                            //Invalidate();
                             goto exit;
                         }
                     }
                     OnRibbonSelected(new(ribbonRect, selected));
                 }
                 else if (delta.IsEmpty)
-                {
                     OnRibbonSelected(new(ribbonRect, selected));
-                }
                 else 
                 {
                     // был режим перетаскивания
@@ -244,7 +234,9 @@ namespace Stories.Model
                     OnElementsChanged();
                 }
                 exit:
+                dragMode = false;
                 delta = Point.Empty;
+                // обнуление прямоугольника выбора
                 ribbonRect = Rectangle.Empty;
                 Invalidate();
             }
