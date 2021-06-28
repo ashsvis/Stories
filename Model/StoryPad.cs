@@ -206,10 +206,10 @@ namespace Stories.Model
                         }
                         // возбуждаем событие окончания выбора
                         OnRibbonSelected(new(ribbonRect, selected));
-                        Invalidate();
+                        //Invalidate();
                         // обнуление прямоугольника выбора
                         ribbonRect = Rectangle.Empty;
-                        return;
+                        goto exit;
                     }
                     else
                     {
@@ -218,13 +218,17 @@ namespace Stories.Model
                             selected.Add(control);
                             // возбуждаем событие окончания выбора
                             OnRibbonSelected(new(ribbonRect, selected));
-                            Invalidate();
-                            return;
+                            //Invalidate();
+                            goto exit;
                         }
                     }
                     OnRibbonSelected(new(ribbonRect, selected));
                 }
-                else if (!delta.IsEmpty)
+                else if (delta.IsEmpty)
+                {
+                    OnRibbonSelected(new(ribbonRect, selected));
+                }
+                else 
                 {
                     // был режим перетаскивания
                     for (var i = 0; i < dragRects.Count; i++)
@@ -235,12 +239,13 @@ namespace Stories.Model
                         pt.Offset(delta);
                         element.Location = pt;
                     }
-                    delta = Point.Empty;
-                    ribbonRect = Rectangle.Empty;
                     dragMode = false;
                     dragRects.Clear();
                     OnElementsChanged();
                 }
+                exit:
+                delta = Point.Empty;
+                ribbonRect = Rectangle.Empty;
                 Invalidate();
             }
         }
