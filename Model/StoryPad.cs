@@ -271,7 +271,15 @@ namespace Stories.Model
                     switch (resizedMarker)
                     {
                         case MarkerKind.TopLeft:
-                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + delta.Y, item.Width - delta.X, item.Height - delta.Y)));
+                            rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + delta.Y, item.Width - delta.X, item.Height - delta.Y));
+                            if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
+                                dragRects.AddRange(rects);
+                            else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
+                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + dh, item.Width - delta.X, item.Height - dh)));
+                            else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
+                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + delta.Y, item.Width - dw, item.Height - delta.Y)));
+                            else
+                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + dh, item.Width - dw, item.Height - dh)));
                             Cursor = Cursors.SizeNWSE;
                             break;
                         case MarkerKind.Top:
