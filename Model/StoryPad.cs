@@ -76,7 +76,7 @@ namespace Stories.Model
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 control.DrawToBitmap(bmp, control.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);
-                DrawSpecifics(e, control, bounds);
+                StoryLibrary.DrawSpecifics(e, control, bounds);
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -111,7 +111,7 @@ namespace Stories.Model
                     using var bmp = new Bitmap(r.Width, r.Height);
                     control.DrawToBitmap(bmp, control.ClientRectangle);
                     e.Graphics.DrawImage(bmp, r);
-                    DrawSpecifics(e, control, r);
+                    StoryLibrary.DrawSpecifics(e, control, r);
                     using (var pen = new Pen(Color.Gray, 2f))
                         e.Graphics.DrawRectangle(pen, r);
                 }
@@ -128,38 +128,6 @@ namespace Stories.Model
             var list = GetMarkerRectangles(rect);
             graphics.FillRectangles(Brushes.White, list);
             graphics.DrawRectangles(Pens.Black, list);
-        }
-
-        private static void DrawSpecifics(PaintEventArgs e, Control control, Rectangle bounds)
-        {
-            if (control is PictureBox pBox)
-            {
-                if (pBox.Image == null)
-                    using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
-            }
-            if (control is Label label)
-            {
-                if (string.IsNullOrWhiteSpace(label.Text) && label.BorderStyle == BorderStyle.None)
-                    using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
-            }
-        }
-
-        private static Rectangle CorrectRect(Control control)
-        {
-            var rect = control.Bounds;
-            rect.Width -= 1;
-            rect.Height -= 1;
-            return rect;
-        }
-
-        private static Rectangle CorrectRect(Rectangle bounds)
-        {
-            var rect = bounds;
-            rect.Width -= 1;
-            rect.Height -= 1;
-            return rect;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -347,6 +315,14 @@ namespace Stories.Model
                 // запрашиваем, чтобы обновился
                 Invalidate();
             }
+        }
+
+        private static Rectangle CorrectRect(Control control)
+        {
+            var rect = control.Bounds;
+            rect.Width -= 1;
+            rect.Height -= 1;
+            return rect;
         }
 
         private void MakeCursorAtMarkers(Point location)
