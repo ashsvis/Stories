@@ -263,7 +263,7 @@ namespace Stories.Model
                 if (workMode == WorkMode.Resize)
                 {
                     dragRects.Clear();
-                    IEnumerable<Rectangle> defs, rects;
+                    IEnumerable<Rectangle> rects;
                     const int minWidth = 5;
                     const int minHeight = 5;
                     var dw = selected.Min(item => item.Width) - minWidth;
@@ -276,8 +276,8 @@ namespace Stories.Model
                             break;
                         case MarkerKind.Top:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width, item.Height - delta.Y));
-                            defs = selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width, item.Height - dh));
-                            dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects : defs);
+                            dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects 
+                                : selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width, item.Height - dh)));
                             Cursor = Cursors.SizeNS;
                             break;
                         case MarkerKind.TopRight:
@@ -286,8 +286,8 @@ namespace Stories.Model
                             break;
                         case MarkerKind.Right:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height));
-                            defs = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height));
-                            dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects : defs);
+                            dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects 
+                                : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height)));
                             Cursor = Cursors.SizeWE;
                             break;
                         case MarkerKind.BottomRight:
@@ -304,8 +304,8 @@ namespace Stories.Model
                             break;
                         case MarkerKind.Bottom:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height + delta.Y));
-                            defs = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height - dh));
-                            dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects : defs);
+                            dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects 
+                                : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height - dh)));
                             Cursor = Cursors.SizeNS;
                             break;
                         case MarkerKind.BottomLeft:
@@ -314,8 +314,8 @@ namespace Stories.Model
                             break;
                         case MarkerKind.Left:
                             rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height));
-                            defs = selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height));
-                            dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects : defs);
+                            dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects 
+                                : selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height)));
                             Cursor = Cursors.SizeWE;
                             break;
                     }
