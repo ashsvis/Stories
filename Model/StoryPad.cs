@@ -291,7 +291,15 @@ namespace Stories.Model
                             Cursor = Cursors.SizeWE;
                             break;
                         case MarkerKind.BottomRight:
-                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height + delta.Y)));
+                            rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height + delta.Y));
+                            if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
+                                dragRects.AddRange(rects);
+                            else if(rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
+                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height - dh)));
+                            else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
+                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height + delta.Y)));
+                            else
+                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height - dh)));
                             Cursor = Cursors.SizeNWSE;
                             break;
                         case MarkerKind.Bottom:
