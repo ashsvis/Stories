@@ -23,6 +23,9 @@ namespace Stories.Model
         private WorkMode workMode = WorkMode.Default;
         private readonly List<Rectangle> dragRects = new();
 
+        private Control resizedControl = null;
+        private int resizedMarkerIndex = -1;
+
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
         public event EventHandler<EventArgs> OnChanged;
 
@@ -55,7 +58,7 @@ namespace Stories.Model
             base.OnPaint(e);
             // рисование элементов, размещенных на поверхности
             foreach (var control in elements.Where(item => item.Visible && 
-                (workMode == WorkMode.Default || workMode == WorkMode.Drag && !selected.Contains(item))).Reverse())
+                (workMode != WorkMode.Drag || workMode == WorkMode.Drag && !selected.Contains(item))).Reverse())
             {
                 var bounds = control.Bounds;
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
@@ -70,6 +73,13 @@ namespace Stories.Model
             {
                 if (selected.Contains(control) && workMode == WorkMode.Default)
                     DrawMarkers(e.Graphics, control);
+            }
+
+            foreach (var rect in dragRects.Where(item => workMode == WorkMode.Resize))
+            {
+                // рисуем рамки прямоугольников размера
+                using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
+                e.Graphics.DrawRectangle(pen, rect);
             }
 
             // если прямоугольник выбора не пуст
@@ -145,6 +155,8 @@ namespace Stories.Model
             base.OnMouseDown(e);
             workMode = WorkMode.Default;
             dragRects.Clear();
+            resizedControl = null;
+            resizedMarkerIndex = -1;
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
             {
@@ -155,6 +167,25 @@ namespace Stories.Model
 
                 OnElementMouseClick(e);
 
+                // проверка, что под курсором есть маркер
+                foreach (var control in selected)
+                {
+                    Rectangle rect = CorrectRect(control);
+                    rect.Inflate(6, 6);
+                    var list = GetMarkerRectangles(rect);
+                    for (var i = 0; i < list.Length; i++)
+                    {
+                        if (list[i].Contains(e.Location))
+                        {
+                            workMode = WorkMode.Resize;
+                            dragRects.AddRange(selected.Select(item => item.Bounds));
+                            resizedControl = control;
+                            resizedMarkerIndex = i;
+                            return;
+                        }
+                    }
+                }
+
                 // проверка, если есть под курсором уже выбранные, тогда добавляем прямоугольники в список для перетаскивания
                 foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location) && selected.Contains(item)))
                 {
@@ -164,7 +195,7 @@ namespace Stories.Model
                     return;
                 }
 
-                // проверка, если есть под курсором нет выбранных, тогдаочищаем список выбранных и добавляем в список выбора и прямоугольники в список для перетаскивания
+                // проверка, если есть под курсором нет выбранных, тогда очищаем список выбранных и добавляем в список выбора и прямоугольники в список для перетаскивания
                 foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location)))
                 {
                     selected.Clear();
@@ -192,31 +223,72 @@ namespace Stories.Model
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
             {
-                // нормализация параметров для прямоугольника выбора
-                // в случае, если мы "растягиваем" прямоугольник не только по "главной" диагонали
-                ribbonRect.X = Math.Min(mouseDownLocation.X, e.Location.X);
-                ribbonRect.Y = Math.Min(mouseDownLocation.Y, e.Location.Y);
-                // размеры должны быть всегда положительные числа
-                ribbonRect.Width = Math.Abs(mouseDownLocation.X - e.Location.X);
-                ribbonRect.Height = Math.Abs(mouseDownLocation.Y - e.Location.Y);
-
                 delta = new Point(e.X - mouseDownLocation.X, e.Y - mouseDownLocation.Y);
-
-                // защиты по перемещению (корректируется размер delta взависимости от ограничений на перемещение)
-                if (!delta.IsEmpty && selected.Count > 0)
+                
+                if (workMode == WorkMode.Default || workMode == WorkMode.Drag)
                 {
-                    Cursor = Cursors.SizeAll;
-                    var rect = selected.First().Bounds;
-                    selected.ForEach(control => { rect = Rectangle.Union(rect, control.Bounds); });
-                    rect.Offset(delta);
-                    // защита по левой и верхней сторонам
-                    if (rect.Left < 0) delta.X += -rect.Left;
-                    if (rect.Top < 0) delta.Y += -rect.Top;
-                    // защита по правой и нижней сторонам
-                    if (rect.Left + rect.Width > this.Width) delta.X -= rect.Left + rect.Width - this.Width;
-                    if (rect.Top + rect.Height > this.Height) delta.Y -= rect.Top + rect.Height - this.Height;
-                }
+                    // нормализация параметров для прямоугольника выбора
+                    // в случае, если мы "растягиваем" прямоугольник не только по "главной" диагонали
+                    ribbonRect.X = Math.Min(mouseDownLocation.X, e.Location.X);
+                    ribbonRect.Y = Math.Min(mouseDownLocation.Y, e.Location.Y);
+                    // размеры должны быть всегда положительные числа
+                    ribbonRect.Width = Math.Abs(mouseDownLocation.X - e.Location.X);
+                    ribbonRect.Height = Math.Abs(mouseDownLocation.Y - e.Location.Y);
 
+                    // защиты по перемещению (корректируется размер delta взависимости от ограничений на перемещение)
+                    if (!delta.IsEmpty && selected.Count > 0)
+                    {
+                        Cursor = Cursors.SizeAll;
+                        var rect = selected.First().Bounds;
+                        selected.ForEach(control => { rect = Rectangle.Union(rect, control.Bounds); });
+                        rect.Offset(delta);
+                        // защита по левой и верхней сторонам
+                        if (rect.Left < 0) delta.X += -rect.Left;
+                        if (rect.Top < 0) delta.Y += -rect.Top;
+                        // защита по правой и нижней сторонам
+                        if (rect.Left + rect.Width > this.Width) delta.X -= rect.Left + rect.Width - this.Width;
+                        if (rect.Top + rect.Height > this.Height) delta.Y -= rect.Top + rect.Height - this.Height;
+                    }
+                }
+                if (workMode == WorkMode.Resize)
+                {
+                    dragRects.Clear();
+                    switch (resizedMarkerIndex)
+                    {
+                        case 0:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + delta.Y, item.Width - delta.X, item.Height - delta.Y)));
+                            Cursor = Cursors.SizeNWSE;
+                            break;
+                        case 1:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width, item.Height - delta.Y)));
+                            Cursor = Cursors.SizeNS;
+                            break;
+                        case 2:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width + delta.X, item.Height - delta.Y)));
+                            Cursor = Cursors.SizeNESW;
+                            break;
+                        case 3:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height)));
+                            Cursor = Cursors.SizeWE;
+                            break;
+                        case 4:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height + delta.Y)));
+                            Cursor = Cursors.SizeNWSE;
+                            break;
+                        case 5:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height + delta.Y)));
+                            Cursor = Cursors.SizeNS;
+                            break;
+                        case 6:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height + delta.Y)));
+                            Cursor = Cursors.SizeNESW;
+                            break;
+                        case 7:
+                            dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height)));
+                            Cursor = Cursors.SizeWE;
+                            break;
+                    }
+                }
                 // запрашиваем, чтобы обновился
                 Invalidate();
             }
@@ -318,7 +390,23 @@ namespace Stories.Model
                 }
                 else if (delta.IsEmpty)
                     OnRibbonSelected(new(ribbonRect, selected));
-                else 
+                else if (workMode == WorkMode.Resize)
+                {
+                    // был режим изменения размеров
+                    for (var i = 0; i < dragRects.Count; i++)
+                    {
+                        var element = elements.FirstOrDefault(item => item == selected[i]);
+                        if (element == null) continue;
+                        var pt = dragRects[i].Location;
+                        var sz = dragRects[i].Size;
+                        element.Location = pt;
+                        element.Size = sz;
+                    }
+                    workMode = WorkMode.Default;
+                    dragRects.Clear();
+                    OnElementsChanged();
+                }
+                else if (workMode == WorkMode.Drag)
                 {
                     // был режим перетаскивания
                     for (var i = 0; i < dragRects.Count; i++)
@@ -333,7 +421,7 @@ namespace Stories.Model
                     dragRects.Clear();
                     OnElementsChanged();
                 }
-                exit:
+            exit:
                 workMode = WorkMode.Default;
                 delta = Point.Empty;
                 // обнуление прямоугольника выбора
