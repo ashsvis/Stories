@@ -30,25 +30,25 @@ namespace Stories.Model
             };
         }
 
-        public static void DrawSpecifics(PaintEventArgs e, Control control, Rectangle bounds)
+        public static void DrawSpecifics(Graphics graphics, Control control, Rectangle bounds)
         {
             if (control is PictureBox pBox)
             {
                 if (pBox.Image == null)
                     using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
+                        graphics.DrawRectangle(pen, CorrectRect(bounds));
             }
             if (control is Label label)
             {
                 if (string.IsNullOrWhiteSpace(label.Text) && label.BorderStyle == BorderStyle.None)
                     using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
+                        graphics.DrawRectangle(pen, CorrectRect(bounds));
             }
             if (control is Panel panel)
             {
                 if (panel.BorderStyle == BorderStyle.None)
                     using (var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
-                        e.Graphics.DrawRectangle(pen, CorrectRect(bounds));
+                        graphics.DrawRectangle(pen, CorrectRect(bounds));
             }
         }
 

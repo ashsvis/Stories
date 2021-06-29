@@ -76,7 +76,18 @@ namespace Stories.Model
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 control.DrawToBitmap(bmp, control.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);
-                StoryLibrary.DrawSpecifics(e, control, bounds);
+                
+                StoryLibrary.DrawSpecifics(e.Graphics, control, bounds);
+
+                if (control is Panel panel)
+                {
+                    foreach (var child in panel.Controls.Cast<Control>())
+                    {
+                        var childbounds = child.Bounds;
+                        using var childbmp = new Bitmap(childbounds.Width, childbounds.Height);
+                        panel.DrawToBitmap(childbmp, child.ClientRectangle);
+                    }
+                }
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -111,7 +122,7 @@ namespace Stories.Model
                     using var bmp = new Bitmap(r.Width, r.Height);
                     control.DrawToBitmap(bmp, control.ClientRectangle);
                     e.Graphics.DrawImage(bmp, r);
-                    StoryLibrary.DrawSpecifics(e, control, r);
+                    StoryLibrary.DrawSpecifics(e.Graphics, control, r);
                     using (var pen = new Pen(Color.Gray, 2f))
                         e.Graphics.DrawRectangle(pen, r);
                 }
@@ -440,6 +451,7 @@ namespace Stories.Model
                 else if (workMode == WorkMode.Drag)
                 {
                     // был режим перетаскивания
+                    dragRects.Reverse();
                     for (var i = 0; i < dragRects.Count; i++)
                     {
                         var element = elements.FirstOrDefault(item => item == selected[i]);
@@ -486,10 +498,21 @@ namespace Stories.Model
             Invalidate();
         }
 
-        public void Add(Control element)
+        public Control Add(Control element)
         {
+            foreach (var panel in elements.OfType<Panel>().Reverse())
+            {
+                if (panel.Bounds.Contains(element.Location))
+                {
+                    element.Location = new Point(element.Location.X - panel.Location.X, element.Location.Y - panel.Location.Y);
+                    panel.Controls.Add(element);
+                    Invalidate();
+                    return panel;
+                }
+            }
             elements.Add(element);
             Invalidate();
+            return null;
         }
 
         public void Remove(Control element)
