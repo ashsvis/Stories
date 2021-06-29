@@ -9,11 +9,18 @@ namespace Stories.Model
 {
     public partial class StoryPad : Panel
     {
+        enum WorkMode
+        {
+            Default,
+            Drag,
+            Resize
+        }
+
         private Rectangle ribbonRect;
         private Point mouseDownLocation;
         private readonly List<Control> elements = new();
         private readonly List<Control> selected = new();
-        private bool dragMode = false;
+        private WorkMode workMode = WorkMode.Default;
         private readonly List<Rectangle> dragRects = new();
 
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
@@ -46,8 +53,9 @@ namespace Stories.Model
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            // рисование элементов, размещенных на повернхости
-            foreach (var control in elements.Where(item => item.Visible && (!dragMode || dragMode && !selected.Contains(item))).Reverse())
+            // рисование элементов, размещенных на поверхности
+            foreach (var control in elements.Where(item => item.Visible && 
+                (workMode == WorkMode.Default || workMode == WorkMode.Drag && !selected.Contains(item))).Reverse())
             {
                 var bounds = control.Bounds;
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
@@ -57,21 +65,22 @@ namespace Stories.Model
             }
 
             // рисование маркеров размеров у выбранных элементов
-            foreach (var control in elements.Where(item => item.Visible && (!dragMode || dragMode && !selected.Contains(item))).Reverse())
+            foreach (var control in elements.Where(item => item.Visible && 
+                (workMode == WorkMode.Default || workMode == WorkMode.Drag && !selected.Contains(item))).Reverse())
             {
-                if (selected.Contains(control) && !dragMode)
+                if (selected.Contains(control) && workMode == WorkMode.Default)
                     DrawMarkers(e.Graphics, control);
             }
 
             // если прямоугольник выбора не пуст
-            if (!ribbonRect.IsEmpty && !dragMode)
+            if (!ribbonRect.IsEmpty && workMode == WorkMode.Default)
             {
                 // рисуем рамку прямоугольника выбора
                 using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
                 e.Graphics.DrawRectangle(pen, ribbonRect);
             }
             // в режиме перетаскивания рисуем со смещением delta
-            if (dragMode)
+            if (workMode == WorkMode.Drag)
             {
                 foreach (var control in selected)
                 {
@@ -134,7 +143,7 @@ namespace Stories.Model
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            dragMode = false;
+            workMode = WorkMode.Default;
             dragRects.Clear();
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
@@ -150,7 +159,7 @@ namespace Stories.Model
                 foreach (var control in elements.Where(item => item.Bounds.Contains(e.Location) && selected.Contains(item)))
                 {
                     // под курсором есть выбранные элементы
-                    dragMode = true;
+                    workMode = WorkMode.Drag;
                     dragRects.AddRange(selected.Select(item => item.Bounds));
                     return;
                 }
@@ -160,7 +169,7 @@ namespace Stories.Model
                 {
                     selected.Clear();
                     selected.Add(control);
-                    dragMode = true;
+                    workMode = WorkMode.Drag;
                     dragRects.AddRange(selected.Select(item => item.Bounds));
                     return;
                 }
@@ -193,7 +202,7 @@ namespace Stories.Model
 
                 delta = new Point(e.X - mouseDownLocation.X, e.Y - mouseDownLocation.Y);
 
-                // защиты по перемещению
+                // защиты по перемещению (корректируется размер delta взависимости от ограничений на перемещение)
                 if (!delta.IsEmpty && selected.Count > 0)
                 {
                     Cursor = Cursors.SizeAll;
@@ -280,7 +289,7 @@ namespace Stories.Model
             base.OnMouseUp(e);
             if (e.Button == MouseButtons.Left)
             {
-                if (!dragMode)
+                if (workMode == WorkMode.Default)
                 {
                     selected.Clear();
                     // инициация события при окончании выбора прямоугольником
@@ -320,12 +329,12 @@ namespace Stories.Model
                         pt.Offset(delta);
                         element.Location = pt;
                     }
-                    dragMode = false;
+                    workMode = WorkMode.Default;
                     dragRects.Clear();
                     OnElementsChanged();
                 }
                 exit:
-                dragMode = false;
+                workMode = WorkMode.Default;
                 delta = Point.Empty;
                 // обнуление прямоугольника выбора
                 ribbonRect = Rectangle.Empty;
