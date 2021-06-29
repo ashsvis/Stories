@@ -80,14 +80,7 @@ namespace Stories.Model
                 StoryLibrary.DrawSpecifics(e.Graphics, control, bounds);
 
                 if (control is Panel panel)
-                {
-                    foreach (var child in panel.Controls.Cast<Control>())
-                    {
-                        var childbounds = child.Bounds;
-                        using var childbmp = new Bitmap(childbounds.Width, childbounds.Height);
-                        panel.DrawToBitmap(childbmp, child.ClientRectangle);
-                    }
-                }
+                    DrawPanel(panel);
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -126,6 +119,18 @@ namespace Stories.Model
                     using (var pen = new Pen(Color.Gray, 2f))
                         e.Graphics.DrawRectangle(pen, r);
                 }
+            }
+        }
+
+        private static void DrawPanel(Panel panel)
+        {
+            foreach (var child in panel.Controls.Cast<Control>())
+            {
+                var childbounds = child.Bounds;
+                using var childbmp = new Bitmap(childbounds.Width, childbounds.Height);
+                panel.DrawToBitmap(childbmp, child.ClientRectangle);
+                if (child is Panel childPanel)
+                    DrawPanel(childPanel);
             }
         }
 
