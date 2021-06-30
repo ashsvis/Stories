@@ -334,27 +334,45 @@ namespace Stories.Model
 
         private void MakeCursorAtMarkers(Point location)
         {
+            // проверка на попадание на маркер связи
+            foreach (var element in elements)
+            {
+                Rectangle rect = CorrectRect(element);
+                rect.Inflate(6, 6);
+                var list = new List<Rectangle>();
+                list.AddRange(element.GetInputLinkMarkerRectangles(rect));
+                list.AddRange(element.GetOutputLinkMarkerRectangles(rect));
+                foreach (var r in list)
+                {
+                    if (r.Contains(location))
+                    {
+                        Cursor = Cursors.Hand;
+                        return;
+                    }
+                }
+            }
+            // проверка на попадание на маркер размера
             foreach (var element in selected)
             {
                 Rectangle rect = CorrectRect(element);
                 rect.Inflate(6, 6);
-                var list = element.GetSizeMarkerRectangles(rect);
-                if (list[0].Contains(location) || list[4].Contains(location))
+                var sizedMarkers = element.GetSizeMarkerRectangles(rect);
+                if (sizedMarkers[0].Contains(location) || sizedMarkers[4].Contains(location))
                 {
                     Cursor = Cursors.SizeNWSE;
                     return;
                 }
-                else if (list[1].Contains(location) || list[5].Contains(location))
+                else if (sizedMarkers[1].Contains(location) || sizedMarkers[5].Contains(location))
                 {
                     Cursor = Cursors.SizeNS;
                     return;
                 }
-                else if (list[2].Contains(location) || list[6].Contains(location))
+                else if (sizedMarkers[2].Contains(location) || sizedMarkers[6].Contains(location))
                 {
                     Cursor = Cursors.SizeNESW;
                     return;
                 }
-                else if (list[3].Contains(location) || list[7].Contains(location))
+                else if (sizedMarkers[3].Contains(location) || sizedMarkers[7].Contains(location))
                 {
                     Cursor = Cursors.SizeWE;
                     return;
@@ -365,9 +383,10 @@ namespace Stories.Model
                     return;
                 }
             }
-            foreach (var control in elements)
+            // проверка на попадание в тело фигуры
+            foreach (var element in elements)
             {
-                Rectangle rect = CorrectRect(control);
+                Rectangle rect = CorrectRect(element);
                 if (rect.Contains(location))
                 {
                     Cursor = Cursors.SizeAll;
