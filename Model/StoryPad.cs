@@ -125,7 +125,7 @@ namespace Stories.Model
             using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             graphics.DrawRectangle(pen, rect);
             rect.Inflate(3, 3);
-            var list = GetMarkerRectangles(rect);
+            var list = GetMarkerRectangles(rect, ((StoryElement)control).AutoSize);
             graphics.FillRectangles(Brushes.White, list);
             graphics.DrawRectangles(Pens.Black, list);
         }
@@ -151,7 +151,7 @@ namespace Stories.Model
                 {
                     Rectangle rect = CorrectRect(control);
                     rect.Inflate(6, 6);
-                    var list = GetMarkerRectangles(rect);
+                    var list = GetMarkerRectangles(rect, ((StoryElement)control).AutoSize);
                     for (var i = 0; i < list.Length; i++)
                     {
                         if (list[i].Contains(e.Location))
@@ -331,7 +331,7 @@ namespace Stories.Model
             {
                 Rectangle rect = CorrectRect(control);
                 rect.Inflate(6, 6);
-                var list = GetMarkerRectangles(rect);
+                var list = GetMarkerRectangles(rect, ((StoryElement)control).AutoSize);
                 if (list[0].Contains(location) || list[4].Contains(location))
                 {
                     Cursor = Cursors.SizeNWSE;
@@ -370,18 +370,18 @@ namespace Stories.Model
             Cursor = Cursors.Default;
         }
 
-        private static Rectangle[] GetMarkerRectangles(Rectangle rect)
+        private static Rectangle[] GetMarkerRectangles(Rectangle rect, bool autoSize)
         {
             var size = new Size(6, 6);
             var list = new Rectangle[]
             {
-                new Rectangle(rect.Location,size),
-                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y), size),
-                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y), size),
+                new Rectangle(rect.Location, autoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y), autoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y), autoSize ? Size.Empty : size),
                 new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + (rect.Height - size.Height) / 2), size),
-                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + rect.Height - size.Height), size),
-                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height), size),
-                new Rectangle(new Point(rect.X, rect.Y + rect.Height - size.Height), size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + rect.Height - size.Height), autoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height), autoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X, rect.Y + rect.Height - size.Height), autoSize ? Size.Empty : size),
                 new Rectangle(new Point(rect.X, rect.Y + (rect.Height - size.Height) / 2), size),
             };
             return list;
