@@ -13,7 +13,7 @@ namespace Stories.Model
             base.AutoSize = true;
         }
 
-        protected void CalculateHeight()
+        protected virtual void CalculateHeight()
         {
             if (!AutoSize) return;
             var text = string.IsNullOrWhiteSpace(Text) ? "Strory Element" : Text;
@@ -39,6 +39,18 @@ namespace Stories.Model
         protected override void OnFontChanged(EventArgs e)
         {
             base.OnFontChanged(e);
+            CalculateHeight();
+        }
+
+        protected override void OnTextChanged(EventArgs e)
+        {
+            base.OnTextChanged(e);
+            CalculateHeight();
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
             CalculateHeight();
         }
 

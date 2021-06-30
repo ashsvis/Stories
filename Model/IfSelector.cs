@@ -1,27 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Stories.Model
 {
-    [Serializable]
-    public partial class BeginOperator : StoryElement
+    public partial class IfSelector : StoryElement
     {
-        protected virtual void TuningControl()
+        private void TuningControl()
         {
-            Size = new Size(70, 25);
-            Text = "Начало";
+            Size = new Size(150, 25);
+            Text = "Верно ли это?";
         }
 
-        public BeginOperator()
+        public IfSelector()
         {
             InitializeComponent();
             TuningControl();
         }
 
-        public BeginOperator(IContainer container)
+        public IfSelector(IContainer container)
         {
             container.Add(this);
 
@@ -29,49 +33,29 @@ namespace Stories.Model
             TuningControl();
         }
 
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-        }
-
         private GraphicsPath GetAreaPath()
         {
             var path = new GraphicsPath();
             var rect = new RectangleF(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            path.AddPath(RoundedRect(rect, Math.Min(Width / 2, Height / 2)), true);
+            path.AddPolygon(new PointF[] 
+            { 
+                new PointF(rect.Left + rect.Width / 2, rect.Top),
+                new PointF(rect.Left + rect.Width, rect.Top + rect.Height / 2),
+                new PointF(rect.Left + rect.Width / 2, rect.Top + rect.Height),
+                new PointF(rect.Left, rect.Top + rect.Height / 2)
+            });
             return path;
         }
 
-        public static GraphicsPath RoundedRect(RectangleF bounds, int radius)
+        protected override void CalculateHeight()
         {
-            int diameter = radius * 2;
-            Size size = new(diameter, diameter);
-            RectangleF arc = new(bounds.Location, size);
-            GraphicsPath path = new();
-
-            if (radius == 0)
+            if (!AutoSize) return;
+            var text = string.IsNullOrWhiteSpace(Text) ? "Верно ли это?" : Text;
+            using (var graphics = this.CreateGraphics())
             {
-                path.AddRectangle(bounds);
-                return path;
+                var size = graphics.MeasureString(text, Font, Width - 7);
+                Height = (int)(size.Height * 3);
             }
-
-            // top left arc  
-            path.AddArc(arc, 180, 90);
-
-            // top right arc  
-            arc.X = bounds.Right - diameter;
-            path.AddArc(arc, 270, 90);
-
-            // bottom right arc  
-            arc.Y = bounds.Bottom - diameter;
-            path.AddArc(arc, 0, 90);
-
-            // bottom left arc 
-            arc.X = bounds.Left;
-            path.AddArc(arc, 90, 90);
-
-            path.CloseFigure();
-            return path;
         }
 
         protected override void OnPaint(PaintEventArgs e)

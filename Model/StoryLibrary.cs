@@ -21,6 +21,7 @@ namespace Stories.Model
             controls = new Type[] 
             { 
                 typeof(BeginOperator),
+                typeof(IfSelector),
                 typeof(EndOperator),
             };
         }

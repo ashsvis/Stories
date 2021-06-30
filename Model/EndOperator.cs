@@ -11,4 +11,5 @@ namespace Stories.Model
             Text = "Конец";
         }
     }
+
 }
