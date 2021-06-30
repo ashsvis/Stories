@@ -20,7 +20,8 @@ namespace Stories.Model
         {
             controls = new Type[] 
             { 
-                typeof(StoryMessage),
+                typeof(BeginOperator),
+                typeof(EndOperator),
             };
         }
 

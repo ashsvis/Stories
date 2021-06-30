@@ -1,7 +1,7 @@
 ﻿
 namespace Stories.Model
 {
-    partial class StoryMessage
+    partial class BeginOperator
     {
         /// <summary>
         /// Обязательная переменная конструктора.

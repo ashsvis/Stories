@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace Stories.Model
 {
     [Serializable]
-    public class StoryElement : Control
+    public abstract class StoryElement : Control
     {
         public StoryElement()
         {
@@ -16,10 +16,10 @@ namespace Stories.Model
         protected void CalculateHeight()
         {
             if (!AutoSize) return;
-            var text = string.IsNullOrWhiteSpace(Text) ? "Strory Message" : Text;
+            var text = string.IsNullOrWhiteSpace(Text) ? "Strory Element" : Text;
             using (var graphics = this.CreateGraphics())
             {
-                var size = graphics.MeasureString(text, Font, Width);
+                var size = graphics.MeasureString(text, Font, Width - 7);
                 Height = (int)(size.Height * 2);
             }
         }
@@ -32,9 +32,14 @@ namespace Stories.Model
             {
                 if (base.AutoSize == value) return;
                 base.AutoSize = value;
-                if (value)
-                    CalculateHeight();
+                CalculateHeight();
             }
+        }
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            CalculateHeight();
         }
 
         [Browsable(false)]
@@ -45,5 +50,11 @@ namespace Stories.Model
 
         [Browsable(false)]
         public override DockStyle Dock { get => base.Dock; set => base.Dock = value; }
+
+        [Browsable(false)]
+        public override bool AllowDrop { get => base.AllowDrop; set => base.AllowDrop = value; }
+
+        [Browsable(false)]
+        public override ContextMenuStrip ContextMenuStrip { get => base.ContextMenuStrip; set => base.ContextMenuStrip = value; }
     }
 }

@@ -118,8 +118,6 @@ namespace Stories
                 // создаем контрол из переданного типа
                 var element = (Control)Activator.CreateInstance((Type)typeNode.Tag);
 
-                // присваиваем видимое тесктовое значение по умолчанию
-                element.Text = typeNode.Text;
                 // располагаем верхний левый угол в точке сбрасывания
                 element.Location = storyPad.PointToClient(new Point(e.X, e.Y));
                 storyPad.Add(element);

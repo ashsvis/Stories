@@ -7,28 +7,21 @@ using System.Windows.Forms;
 namespace Stories.Model
 {
     [Serializable]
-    public partial class StoryMessage : StoryElement
+    public partial class BeginOperator : StoryElement
     {
-        RectangleF rect;
-
-        private void TuningControl()
+        protected virtual void TuningControl()
         {
-            Size = new Size(160, 40);
-            TuningSize();
+            Size = new Size(70, 25);
+            Text = "Начало";
         }
 
-        private void TuningSize()
-        {
-            rect = new RectangleF(0, 0, Size.Width - 1, Size.Height - 1);
-        }
-
-        public StoryMessage()
+        public BeginOperator()
         {
             InitializeComponent();
             TuningControl();
         }
 
-        public StoryMessage(IContainer container)
+        public BeginOperator(IContainer container)
         {
             container.Add(this);
 
@@ -39,12 +32,12 @@ namespace Stories.Model
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            TuningSize();
         }
 
         private GraphicsPath GetAreaPath()
         {
             var path = new GraphicsPath();
+            var rect = new RectangleF(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
             path.AddPath(RoundedRect(rect, Math.Min(Width / 2, Height / 2)), true);
             return path;
         }
@@ -95,14 +88,15 @@ namespace Stories.Model
                                        SystemColors.ControlDark,
                                        SystemColors.ControlLightLight))
                     gr.FillPath(brush, path);
-                using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.InactiveCaption))
+                using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.ControlDark))
                     gr.DrawPath(pen, path);
                 rect.Inflate(-3, -3);
                 using (var sf = new StringFormat())
                 {
                     sf.Alignment = StringAlignment.Center;
                     sf.LineAlignment = StringAlignment.Center;
-                    gr.DrawString(Text, Font, Brushes.Black, rect, sf);
+                    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
+                        gr.DrawString(Text, Font, brush, rect, sf);
                 }
             }
         }
