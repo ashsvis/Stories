@@ -138,7 +138,7 @@ namespace Stories
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(794, 373);
-            this.splitContainer1.SplitterDistance = 541;
+            this.splitContainer1.SplitterDistance = 543;
             this.splitContainer1.SplitterWidth = 2;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -151,7 +151,7 @@ namespace Stories
             this.panelCentral.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelCentral.Location = new System.Drawing.Point(0, 0);
             this.panelCentral.Name = "panelCentral";
-            this.panelCentral.Size = new System.Drawing.Size(541, 373);
+            this.panelCentral.Size = new System.Drawing.Size(543, 373);
             this.panelCentral.TabIndex = 0;
             this.panelCentral.DragDrop += new System.Windows.Forms.DragEventHandler(this.storyPad_DragDrop);
             this.panelCentral.DragOver += new System.Windows.Forms.DragEventHandler(this.storyPad_DragOver);
@@ -185,7 +185,7 @@ namespace Stories
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.pgStoryElement);
-            this.splitContainer2.Size = new System.Drawing.Size(251, 373);
+            this.splitContainer2.Size = new System.Drawing.Size(249, 373);
             this.splitContainer2.SplitterDistance = 175;
             this.splitContainer2.SplitterWidth = 2;
             this.splitContainer2.TabIndex = 0;
@@ -199,7 +199,7 @@ namespace Stories
             this.tcSelector.Location = new System.Drawing.Point(0, 0);
             this.tcSelector.Name = "tcSelector";
             this.tcSelector.SelectedIndex = 0;
-            this.tcSelector.Size = new System.Drawing.Size(251, 175);
+            this.tcSelector.Size = new System.Drawing.Size(249, 175);
             this.tcSelector.TabIndex = 1;
             // 
             // tabPage1
@@ -208,7 +208,7 @@ namespace Stories
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(243, 147);
+            this.tabPage1.Size = new System.Drawing.Size(241, 147);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Project";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -221,7 +221,7 @@ namespace Stories
             this.tvStory.HideSelection = false;
             this.tvStory.Location = new System.Drawing.Point(3, 3);
             this.tvStory.Name = "tvStory";
-            this.tvStory.Size = new System.Drawing.Size(237, 141);
+            this.tvStory.Size = new System.Drawing.Size(235, 141);
             this.tvStory.TabIndex = 0;
             this.tvStory.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvStory_AfterSelect);
             // 
@@ -231,7 +231,7 @@ namespace Stories
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(243, 147);
+            this.tabPage2.Size = new System.Drawing.Size(241, 147);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Library";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -243,7 +243,7 @@ namespace Stories
             this.tvLibrary.FullRowSelect = true;
             this.tvLibrary.Location = new System.Drawing.Point(3, 3);
             this.tvLibrary.Name = "tvLibrary";
-            this.tvLibrary.Size = new System.Drawing.Size(237, 141);
+            this.tvLibrary.Size = new System.Drawing.Size(235, 141);
             this.tvLibrary.TabIndex = 0;
             this.tvLibrary.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tvLibrary_MouseDown);
             this.tvLibrary.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tvLibrary_MouseMove);
@@ -256,7 +256,7 @@ namespace Stories
             this.pgStoryElement.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgStoryElement.Location = new System.Drawing.Point(0, 0);
             this.pgStoryElement.Name = "pgStoryElement";
-            this.pgStoryElement.Size = new System.Drawing.Size(251, 196);
+            this.pgStoryElement.Size = new System.Drawing.Size(249, 196);
             this.pgStoryElement.TabIndex = 0;
             this.pgStoryElement.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.pgStoryElement_PropertyValueChanged);
             // 
@@ -739,11 +739,13 @@ namespace Stories
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainStoriesForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultBounds;
             this.Text = "Stories";
             this.Load += new System.EventHandler(this.MainStoriesForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainStoriesForm_KeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

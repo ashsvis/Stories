@@ -463,10 +463,20 @@ namespace Stories.Model
             }
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        public void KeyDownExecute(Keys keyCode, Keys modifiers)
         {
-            base.OnKeyDown(e);
-
+            if (keyCode == Keys.Delete)
+            {
+                var list = new List<Control>(selected);
+                var changed = false;
+                foreach (var item in list)
+                {
+                    Remove(item);
+                    changed = true;
+                }
+                if (changed)
+                    OnElementsChanged();
+            }
         }
 
         protected virtual void OnRibbonSelected(RibbonSelectedEventArgs e)

@@ -299,5 +299,19 @@ namespace Stories
         {
             storyPad.SelectedAlignBottoms();
         }
+
+        private void MainStoriesForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            storyPad.KeyDownExecute(e.KeyCode, e.Modifiers);
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (tvStory.SelectedNode != null)
+                    tvStory.Nodes.Remove(tvStory.SelectedNode);
+                if (tvStory.SelectedNode != null)
+                    pgStoryElement.SelectedObject = tvStory.SelectedNode.Tag;
+                else
+                    pgStoryElement.SelectedObject = null;
+            }
+        }
     }
 }
