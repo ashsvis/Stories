@@ -62,6 +62,10 @@ namespace Stories.Model
             return list;
         }
 
+        public StoryElement Prev { get; set; }
+
+        public StoryElement[] Nexts { get; set; }
+
         [Browsable(true), DefaultValue(true)]
         public new bool AutoSize
         {
