@@ -6,21 +6,19 @@ using System.Windows.Forms;
 
 namespace Stories.Model
 {
-    public partial class StoryMessage : Control
+    [Serializable]
+    public partial class StoryMessage : StoryElement
     {
         RectangleF rect;
 
         private void TuningControl()
         {
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
-            Size = new Size(40, 40);
+            Size = new Size(160, 40);
             TuningSize();
         }
 
         private void TuningSize()
         {
-            //var side = Size.Width > Size.Height ? Size.Height : Size.Width;
-            //rect = new RectangleF(0, 0, side - 1, side - 1);
             rect = new RectangleF(0, 0, Size.Width - 1, Size.Height - 1);
         }
 
@@ -47,17 +45,16 @@ namespace Stories.Model
         private GraphicsPath GetAreaPath()
         {
             var path = new GraphicsPath();
-            //path.AddEllipse(rect);
-            path.AddPath(RoundedRect(rect, 10), true);
+            path.AddPath(RoundedRect(rect, Math.Min(Width / 2, Height / 2)), true);
             return path;
         }
 
         public static GraphicsPath RoundedRect(RectangleF bounds, int radius)
         {
             int diameter = radius * 2;
-            Size size = new Size(diameter, diameter);
-            RectangleF arc = new RectangleF(bounds.Location, size);
-            GraphicsPath path = new GraphicsPath();
+            Size size = new(diameter, diameter);
+            RectangleF arc = new(bounds.Location, size);
+            GraphicsPath path = new();
 
             if (radius == 0)
             {
@@ -105,9 +102,21 @@ namespace Stories.Model
                 {
                     sf.Alignment = StringAlignment.Center;
                     sf.LineAlignment = StringAlignment.Center;
-                    gr.DrawString("Story message", SystemFonts.MessageBoxFont, Brushes.Black, rect, sf);
+                    gr.DrawString(Text, Font, Brushes.Black, rect, sf);
                 }
             }
+        }
+
+        protected override void OnTextChanged(EventArgs e)
+        {
+            base.OnTextChanged(e);
+            CalculateHeight();
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            CalculateHeight();
         }
     }
 }

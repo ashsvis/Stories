@@ -10,7 +10,7 @@ namespace Stories
 {
     public partial class MainStoriesForm : Form
     {
-        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContent.cfg";
+        private readonly string PATH = $"{Environment.CurrentDirectory}\\StoryContent.bin";
         private FileIOService fileIOService;
 
         public MainStoriesForm()

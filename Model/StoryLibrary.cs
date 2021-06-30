@@ -20,12 +20,7 @@ namespace Stories.Model
         {
             controls = new Type[] 
             { 
-                typeof(Label),
-                typeof(Button),
-                typeof(TextBox),
-                typeof(CheckBox),
-                typeof(RadioButton),
-                typeof(PictureBox)
+                typeof(StoryMessage),
             };
         }
 
