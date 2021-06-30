@@ -479,6 +479,12 @@ namespace Stories.Model
             }
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+        }
+
         protected virtual void OnRibbonSelected(RibbonSelectedEventArgs e)
         {
             // если на событие подписались, то вызываем его
@@ -503,21 +509,10 @@ namespace Stories.Model
             Invalidate();
         }
 
-        public Control Add(Control element)
+        public void Add(Control element)
         {
-            foreach (var panel in elements.OfType<Panel>().Reverse())
-            {
-                if (panel.Bounds.Contains(element.Location))
-                {
-                    element.Location = new Point(element.Location.X - panel.Location.X, element.Location.Y - panel.Location.Y);
-                    panel.Controls.Add(element);
-                    Invalidate();
-                    return panel;
-                }
-            }
             elements.Add(element);
             Invalidate();
-            return null;
         }
 
         public void Remove(Control element)

@@ -25,8 +25,7 @@ namespace Stories.Model
                 typeof(TextBox),
                 typeof(CheckBox),
                 typeof(RadioButton),
-                typeof(PictureBox),
-                typeof(Panel)
+                typeof(PictureBox)
             };
         }
 

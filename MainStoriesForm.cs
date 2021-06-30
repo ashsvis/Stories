@@ -122,16 +122,12 @@ namespace Stories
                 element.Text = typeNode.Text;
                 // располагаем верхний левый угол в точке сбрасывания
                 element.Location = storyPad.PointToClient(new Point(e.X, e.Y));
-                var container = storyPad.Add(element);
+                storyPad.Add(element);
 
                 ContentChanged = true;
-                var containerNode = tvStory.Nodes.Cast<TreeNode>().FirstOrDefault(node => node.Tag == container);
                 // добавляем новый элемент в дерево проекта
                 var controlNode = new TreeNode(element.Text) { Tag = element };
-                if (containerNode != null)
-                    containerNode.Nodes.Add(controlNode);
-                else
-                    tvStory.Nodes.Add(controlNode);
+                tvStory.Nodes.Add(controlNode);
                 // делаем его текущим
                 tvStory.SelectedNode = controlNode;
             }
