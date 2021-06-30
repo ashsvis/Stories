@@ -47,7 +47,11 @@ namespace Stories.Model
         private readonly List<Rectangle> dragRects = new();
 
         private SizeMarkerKind resizedMarker = SizeMarkerKind.None;
-        private LinkMarkerKind linkedMarker = LinkMarkerKind.None;
+
+        private StoryElement sourceElement = null;
+        private StoryElement targetElement = null;
+        private LinkMarkerKind linkedInputMarker = LinkMarkerKind.None;
+        private LinkMarkerKind linkedOutputMarker = LinkMarkerKind.None;
 
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
         public event EventHandler<EventArgs> OnChanged;
@@ -159,6 +163,12 @@ namespace Stories.Model
             base.OnMouseDown(e);
             workMode = WorkMode.Default;
             dragRects.Clear();
+
+            sourceElement = null;
+            targetElement = null;
+            linkedInputMarker = LinkMarkerKind.None;
+            linkedOutputMarker = LinkMarkerKind.None;
+
             resizedMarker = SizeMarkerKind.None;
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
@@ -184,7 +194,8 @@ namespace Stories.Model
                             var pt = list[i].Location;
                             pt.Offset(list[i].Size.Width / 2, list[i].Size.Height / 2);
                             mouseDownLocation = pt;
-                            linkedMarker = (LinkMarkerKind)i;
+                            linkedOutputMarker = (LinkMarkerKind)i;
+                            sourceElement = element;
                             return;
                         }
                     }
@@ -197,7 +208,8 @@ namespace Stories.Model
                             var pt = list[i].Location;
                             pt.Offset(list[i].Size.Width / 2, list[i].Size.Height / 2);
                             mouseDownLocation = pt;
-                            linkedMarker = (LinkMarkerKind)i;
+                            linkedInputMarker = (LinkMarkerKind)i;
+                            targetElement = element;
                             return;
                         }
                     }
@@ -263,8 +275,40 @@ namespace Stories.Model
                 
                 if (workMode == WorkMode.LinkFromInput || workMode == WorkMode.LinkFromOutput)
                 {
-                    Cursor = Cursors.Cross;
+                    
                     ribbonLine = new Point[] { mouseDownLocation, e.Location };
+
+                    // проверка, что под курсором есть маркер подключения связи
+                    foreach (var element in elements.ToArray().Reverse())
+                    {
+                        Rectangle rect = CorrectRect(element);
+                        rect.Inflate(6, 6);
+                        var list = workMode == WorkMode.LinkFromInput 
+                            ? element.GetOutputLinkMarkerRectangles(rect)
+                            : element.GetInputLinkMarkerRectangles(rect);
+                        for (var i = 0; i < list.Length; i++)
+                        {
+                            if (list[i].Contains(e.Location))
+                            {
+                                if (workMode == WorkMode.LinkFromInput)
+                                {
+                                    linkedInputMarker = (LinkMarkerKind)i;
+                                    sourceElement = element;
+                                }
+                                else
+                                {
+                                    linkedOutputMarker = (LinkMarkerKind)i;
+                                    targetElement = element;
+                                }
+                                if (sourceElement != targetElement)
+                                    Cursor = Cursors.Cross;
+                                else
+                                    Cursor = Cursors.No;
+                                return;
+                            }
+                        }
+                    }
+                    Cursor = Cursors.Arrow;
                 }
 
                 if (workMode == WorkMode.Default || workMode == WorkMode.Drag)
