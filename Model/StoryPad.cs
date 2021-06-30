@@ -13,10 +13,12 @@ namespace Stories.Model
         {
             Default,
             Drag,
-            Resize
+            Resize,
+            LinkFromOutput,
+            LinkFromInput,
         }
 
-        enum MarkerKind
+        enum SizeMarkerKind
         {
             None = -1,
             TopLeft = 0,
@@ -29,14 +31,23 @@ namespace Stories.Model
             Left = 7
         }
 
+        enum LinkMarkerKind
+        {
+            None = -1,
+            YesPath = 0,
+            NoPath = 1,
+        }
+
         private Rectangle ribbonRect;
+        private Point[] ribbonLine = new Point[2];
         private Point mouseDownLocation;
         private readonly List<StoryElement> elements = new();
         private readonly List<StoryElement> selected = new();
         private WorkMode workMode = WorkMode.Default;
         private readonly List<Rectangle> dragRects = new();
 
-        private MarkerKind resizedMarker = MarkerKind.None;
+        private SizeMarkerKind resizedMarker = SizeMarkerKind.None;
+        private LinkMarkerKind linkedMarker = LinkMarkerKind.None;
 
         public event EventHandler<RibbonSelectedEventArgs> OnSelected;
         public event EventHandler<EventArgs> OnChanged;
@@ -113,6 +124,13 @@ namespace Stories.Model
                     e.Graphics.DrawRectangle(grayPen, r);
                 }
             }
+            // рисование резиновой линии связи в режиме определения связей
+            if (workMode == WorkMode.LinkFromInput || workMode == WorkMode.LinkFromOutput)
+            {
+                using var linePen = new Pen(workMode == WorkMode.LinkFromInput ? Color.Lime : Color.HotPink, 2) 
+                { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                e.Graphics.DrawLines(linePen, ribbonLine);
+            }
         }
 
         private void DrawMarkers(Graphics graphics, StoryElement element)
@@ -141,7 +159,7 @@ namespace Stories.Model
             base.OnMouseDown(e);
             workMode = WorkMode.Default;
             dragRects.Clear();
-            resizedMarker = MarkerKind.None;
+            resizedMarker = SizeMarkerKind.None;
             // обрабатываем событие, если была нажата левая кнопка мышки
             if (e.Button == MouseButtons.Left)
             {
@@ -152,7 +170,40 @@ namespace Stories.Model
 
                 OnElementMouseClick(e);
 
-                // проверка, что под курсором есть маркер
+                // проверка, что под курсором есть маркер подключения связи
+                foreach (var element in elements.ToArray().Reverse())
+                {
+                    Rectangle rect = CorrectRect(element);
+                    rect.Inflate(6, 6);
+                    var list = element.GetOutputLinkMarkerRectangles(rect);
+                    for (var i = 0; i < list.Length; i++)
+                    {
+                        if (list[i].Contains(e.Location))
+                        {
+                            workMode = WorkMode.LinkFromOutput;
+                            var pt = list[i].Location;
+                            pt.Offset(list[i].Size.Width / 2, list[i].Size.Height / 2);
+                            mouseDownLocation = pt;
+                            linkedMarker = (LinkMarkerKind)i;
+                            return;
+                        }
+                    }
+                    list = element.GetInputLinkMarkerRectangles(rect);
+                    for (var i = 0; i < list.Length; i++)
+                    {
+                        if (list[i].Contains(e.Location))
+                        {
+                            workMode = WorkMode.LinkFromInput;
+                            var pt = list[i].Location;
+                            pt.Offset(list[i].Size.Width / 2, list[i].Size.Height / 2);
+                            mouseDownLocation = pt;
+                            linkedMarker = (LinkMarkerKind)i;
+                            return;
+                        }
+                    }
+                }
+
+                // проверка, что под курсором есть маркер изменения размера
                 foreach (var element in selected.ToArray().Reverse())
                 {
                     Rectangle rect = CorrectRect(element);
@@ -164,7 +215,7 @@ namespace Stories.Model
                         {
                             workMode = WorkMode.Resize;
                             dragRects.AddRange(selected.Select(item => item.Bounds));
-                            resizedMarker = (MarkerKind)i;
+                            resizedMarker = (SizeMarkerKind)i;
                             return;
                         }
                     }
@@ -210,6 +261,12 @@ namespace Stories.Model
             {
                 delta = new Point(e.X - mouseDownLocation.X, e.Y - mouseDownLocation.Y);
                 
+                if (workMode == WorkMode.LinkFromInput || workMode == WorkMode.LinkFromOutput)
+                {
+                    Cursor = Cursors.Cross;
+                    ribbonLine = new Point[] { mouseDownLocation, e.Location };
+                }
+
                 if (workMode == WorkMode.Default || workMode == WorkMode.Drag)
                 {
                     // нормализация параметров для прямоугольника выбора
@@ -220,7 +277,7 @@ namespace Stories.Model
                     ribbonRect.Width = Math.Abs(mouseDownLocation.X - e.Location.X);
                     ribbonRect.Height = Math.Abs(mouseDownLocation.Y - e.Location.Y);
 
-                    // защиты по перемещению (корректируется размер delta взависимости от ограничений на перемещение)
+                    // защиты по перемещению (корректируется размер delta в зависимости от ограничений на перемещение)
                     if (!delta.IsEmpty && selected.Count > 0)
                     {
                         Cursor = Cursors.SizeAll;
@@ -245,7 +302,7 @@ namespace Stories.Model
                     var dh = selected.Min(item => item.Height) - minHeight;
                     switch (resizedMarker)
                     {
-                        case MarkerKind.TopLeft:
+                        case SizeMarkerKind.TopLeft:
                             rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + delta.Y, item.Width - delta.X, item.Height - delta.Y));
                             if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
                                 dragRects.AddRange(rects);
@@ -257,13 +314,13 @@ namespace Stories.Model
                                 dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + dh, item.Width - dw, item.Height - dh)));
                             Cursor = Cursors.SizeNWSE;
                             break;
-                        case MarkerKind.Top:
+                        case SizeMarkerKind.Top:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width, item.Height - delta.Y));
                             dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects 
                                 : selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width, item.Height - dh)));
                             Cursor = Cursors.SizeNS;
                             break;
-                        case MarkerKind.TopRight:
+                        case SizeMarkerKind.TopRight:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width + delta.X, item.Height - delta.Y));
                             if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
                                 dragRects.AddRange(rects);
@@ -275,13 +332,13 @@ namespace Stories.Model
                                 dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width - dw, item.Height - dh)));
                             Cursor = Cursors.SizeNESW;
                             break;
-                        case MarkerKind.Right:
+                        case SizeMarkerKind.Right:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height));
                             dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects 
                                 : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height)));
                             Cursor = Cursors.SizeWE;
                             break;
-                        case MarkerKind.BottomRight:
+                        case SizeMarkerKind.BottomRight:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height + delta.Y));
                             if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
                                 dragRects.AddRange(rects);
@@ -293,13 +350,13 @@ namespace Stories.Model
                                 dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height - dh)));
                             Cursor = Cursors.SizeNWSE;
                             break;
-                        case MarkerKind.Bottom:
+                        case SizeMarkerKind.Bottom:
                             rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height + delta.Y));
                             dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects 
                                 : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height - dh)));
                             Cursor = Cursors.SizeNS;
                             break;
-                        case MarkerKind.BottomLeft:
+                        case SizeMarkerKind.BottomLeft:
                             rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height + delta.Y));
                             if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
                                 dragRects.AddRange(rects);
@@ -311,7 +368,7 @@ namespace Stories.Model
                                 dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height - dh)));
                             Cursor = Cursors.SizeNESW;
                             break;
-                        case MarkerKind.Left:
+                        case SizeMarkerKind.Left:
                             rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height));
                             dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects 
                                 : selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height)));
