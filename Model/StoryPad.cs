@@ -76,7 +76,6 @@ namespace Stories.Model
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 control.DrawToBitmap(bmp, control.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);                
-                StoryLibrary.DrawSpecifics(e.Graphics, control, bounds);
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -111,8 +110,7 @@ namespace Stories.Model
                     using var bmp = new Bitmap(r.Width, r.Height);
                     control.DrawToBitmap(bmp, control.ClientRectangle);
                     e.Graphics.DrawImage(bmp, r);
-                    StoryLibrary.DrawSpecifics(e.Graphics, control, r);
-                        e.Graphics.DrawRectangle(grayPen, r);
+                    e.Graphics.DrawRectangle(grayPen, r);
                 }
             }
         }
@@ -124,9 +122,18 @@ namespace Stories.Model
             using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             graphics.DrawRectangle(pen, rect);
             rect.Inflate(3, 3);
-            var list = element.GetSizeMarkerRectangles(rect);
-            graphics.FillRectangles(Brushes.White, list);
-            graphics.DrawRectangles(Pens.Black, list);
+            // маркеры размерные
+            var sizesList = element.GetSizeMarkerRectangles(rect);
+            graphics.FillRectangles(Brushes.White, sizesList);
+            graphics.DrawRectangles(Pens.Black, sizesList);
+            // маркеры выходных связей
+            var linkOutList = element.GetOutputLinkMarkerRectangles(rect);
+            graphics.FillRectangles(Brushes.Pink, linkOutList);
+            graphics.DrawRectangles(Pens.Black, linkOutList);
+            // маркеры входных связей
+            var linkInpList = element.GetInputLinkMarkerRectangles(rect);
+            graphics.FillRectangles(Brushes.Lime, linkInpList);
+            graphics.DrawRectangles(Pens.Black, linkInpList);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -172,7 +179,8 @@ namespace Stories.Model
                     return;
                 }
 
-                // проверка, если есть под курсором нет выбранных, тогда очищаем список выбранных и добавляем в список выбора и прямоугольники в список для перетаскивания
+                // проверка, если есть под курсором нет выбранных, тогда очищаем список выбранных и добавляем
+                // в список выбора и прямоугольники в список для перетаскивания
                 foreach (var control in elements.ToArray().Reverse().Where(item => item.Bounds.Contains(e.Location)))
                 {
                     selected.Clear();

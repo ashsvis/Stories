@@ -42,6 +42,26 @@ namespace Stories.Model
             return list;
         }
 
+        public virtual Rectangle[] GetOutputLinkMarkerRectangles(Rectangle rect)
+        {
+            var size = new Size(6, 6);
+            var list = new Rectangle[]
+            {
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height * 2), size)
+            };
+            return list;
+        }
+
+        public virtual Rectangle[] GetInputLinkMarkerRectangles(Rectangle rect)
+        {
+            var size = new Size(6, 6);
+            var list = new Rectangle[]
+            {
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + size.Height), size)
+            };
+            return list;
+        }
+
         [Browsable(true), DefaultValue(true)]
         public new bool AutoSize
         {

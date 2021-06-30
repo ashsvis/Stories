@@ -1,7 +1,7 @@
 ﻿
 namespace Stories.Model
 {
-    partial class IfSelector
+    partial class IfElement
     {
         /// <summary>
         /// Required designer variable.

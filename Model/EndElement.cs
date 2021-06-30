@@ -7,21 +7,21 @@ using System.Windows.Forms;
 namespace Stories.Model
 {
     [Serializable]
-    public partial class BeginOperator : StoryElement
+    public partial class EndElement : StoryElement
     {
         protected virtual void TuningControl()
         {
             Size = new Size(70, 25);
-            Text = "Начало";
+            Text = "Конец";
         }
 
-        public BeginOperator()
+        public EndElement()
         {
             InitializeComponent();
             TuningControl();
         }
 
-        public BeginOperator(IContainer container)
+        public EndElement(IContainer container)
         {
             container.Add(this);
 
@@ -102,6 +102,23 @@ namespace Stories.Model
                         gr.DrawString(Text, Font, brush, rect, sf);
                 }
             }
+        }
+
+        public bool IsEnd { get; set; }
+
+        /// <summary>
+        /// Запрет маркеров исходящих связей
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public override Rectangle[] GetOutputLinkMarkerRectangles(Rectangle rect)
+        {
+            var size = new Size(6, 6);
+            var list = new Rectangle[]
+            {
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + size.Height), Size.Empty)
+            };
+            return list;
         }
     }
 }

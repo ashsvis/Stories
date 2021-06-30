@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Stories.Model
 {
-    public partial class IfSelector : StoryElement
+    public partial class IfElement : StoryElement
     {
         private void TuningControl()
         {
@@ -19,13 +19,13 @@ namespace Stories.Model
             Text = "Верно ли это?";
         }
 
-        public IfSelector()
+        public IfElement()
         {
             InitializeComponent();
             TuningControl();
         }
 
-        public IfSelector(IContainer container)
+        public IfElement(IContainer container)
         {
             container.Add(this);
 
@@ -96,6 +96,22 @@ namespace Stories.Model
                 //        gr.DrawString(noText, Font, brush, noPoint);
                 //}
             }
+        }
+
+        /// <summary>
+        /// Переопределение маркеров исходящих связей
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public override Rectangle[] GetOutputLinkMarkerRectangles(Rectangle rect)
+        {
+            var size = new Size(6, 6);
+            var list = new Rectangle[]
+            {
+                new Rectangle(new Point(rect.X + rect.Width - size.Width * 2, rect.Y + (rect.Height - size.Height) / 2), size), // маркер 0 - ДА-ветка
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height * 2), size)  // маркер 1 - НЕТ-ветка
+            };
+            return list;
         }
     }
 }

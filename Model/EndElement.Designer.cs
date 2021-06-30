@@ -1,7 +1,7 @@
 ﻿
 namespace Stories.Model
 {
-    partial class BeginOperator
+    partial class EndElement
     {
         /// <summary>
         /// Обязательная переменная конструктора.
