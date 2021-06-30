@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Stories.Model
@@ -22,6 +23,23 @@ namespace Stories.Model
                 var size = graphics.MeasureString(text, Font, Width - 7);
                 Height = (int)(size.Height * 2);
             }
+        }
+
+        public Rectangle[] GetSizeMarkerRectangles(Rectangle rect)
+        {
+            var size = new Size(6, 6);
+            var list = new Rectangle[]
+            {
+                new Rectangle(rect.Location, AutoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y), AutoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y), AutoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + (rect.Height - size.Height) / 2), size),
+                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + rect.Height - size.Height), AutoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height), AutoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X, rect.Y + rect.Height - size.Height), AutoSize ? Size.Empty : size),
+                new Rectangle(new Point(rect.X, rect.Y + (rect.Height - size.Height) / 2), size),
+            };
+            return list;
         }
 
         [Browsable(true), DefaultValue(true)]

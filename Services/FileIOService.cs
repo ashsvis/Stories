@@ -18,23 +18,23 @@ namespace Stories.Services
             PATH = path;
         }
 
-        public List<Control> LoadData()
+        public List<StoryElement> LoadData()
         {
             bool fileExists = File.Exists(PATH);
             if (!fileExists)
-                return new List<Control>();
+                return new List<StoryElement>();
             using (var fs = File.OpenRead(PATH))
             using (var zip = new GZipStream(fs, CompressionMode.Decompress))
             {
                 var formatter = new BinaryFormatter();
                 var items = (List<StoreItem>)formatter.Deserialize(zip);
 
-                var list = new List<Control>();
+                var list = new List<StoryElement>();
                 foreach (var item in items)
                 {
                     var type = StoryLibrary.GetTypeByFullName(item.Type);
                     if (type == null) continue;
-                    var control = (Control)Activator.CreateInstance(type);
+                    var control = (StoryElement)Activator.CreateInstance(type);
                     list.Add(control);
                     foreach (var aprop in item.Props)
                     {
@@ -46,7 +46,7 @@ namespace Stories.Services
             }
         }
 
-        public void SaveData(IEnumerable<Control> controls)
+        public void SaveData(IEnumerable<StoryElement> controls)
         {
             var samples = new Dictionary<Type, object>();
             var content = new List<StoreItem>();

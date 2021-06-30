@@ -82,6 +82,19 @@ namespace Stories.Model
                     using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
                         gr.DrawString(Text, Font, brush, rect, sf);
                 }
+                //using (var graphics = this.CreateGraphics())
+                //{
+                //    var yesText = "Да";
+                //    var yesSize = gr.MeasureString(yesText, Font);
+                //    var yesPoint = new PointF(rect.Left + rect.Width - yesSize.Width + 8, rect.Top + rect.Height / 2 - yesSize.Height);
+                //    var noText = "Нет";
+                //    var noSize = gr.MeasureString(noText, Font);
+                //    var noPoint = new PointF(rect.Left + rect.Width / 2, rect.Top + rect.Height - noSize.Height + 8);
+                //    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
+                //            gr.DrawString(yesText, Font, brush, yesPoint);
+                //    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
+                //        gr.DrawString(noText, Font, brush, noPoint);
+                //}
             }
         }
     }

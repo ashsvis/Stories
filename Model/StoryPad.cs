@@ -31,8 +31,8 @@ namespace Stories.Model
 
         private Rectangle ribbonRect;
         private Point mouseDownLocation;
-        private readonly List<Control> elements = new();
-        private readonly List<Control> selected = new();
+        private readonly List<StoryElement> elements = new();
+        private readonly List<StoryElement> selected = new();
         private WorkMode workMode = WorkMode.Default;
         private readonly List<Rectangle> dragRects = new();
 
@@ -63,7 +63,7 @@ namespace Stories.Model
             Init();
         }
 
-        public IEnumerable<Control> Elements => elements;
+        public IEnumerable<StoryElement> Elements => elements;
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -87,10 +87,10 @@ namespace Stories.Model
                     DrawMarkers(e.Graphics, control);
             }
 
+            // рисуем рамки прямоугольников размера в режиме изменения размера
+            using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             foreach (var rect in dragRects.Where(item => workMode == WorkMode.Resize))
             {
-                // рисуем рамки прямоугольников размера
-                using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
                 e.Graphics.DrawRectangle(pen, rect);
             }
 
@@ -98,12 +98,12 @@ namespace Stories.Model
             if (!ribbonRect.IsEmpty && workMode == WorkMode.Default)
             {
                 // рисуем рамку прямоугольника выбора
-                using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
                 e.Graphics.DrawRectangle(pen, ribbonRect);
             }
             // в режиме перетаскивания рисуем со смещением delta
             if (workMode == WorkMode.Drag)
             {
+                using (var grayPen = new Pen(Color.Gray, 2f))
                 foreach (var control in selected)
                 {
                     var r = control.Bounds;
@@ -112,20 +112,19 @@ namespace Stories.Model
                     control.DrawToBitmap(bmp, control.ClientRectangle);
                     e.Graphics.DrawImage(bmp, r);
                     StoryLibrary.DrawSpecifics(e.Graphics, control, r);
-                    using (var pen = new Pen(Color.Gray, 2f))
-                        e.Graphics.DrawRectangle(pen, r);
+                        e.Graphics.DrawRectangle(grayPen, r);
                 }
             }
         }
 
-        private void DrawMarkers(Graphics graphics, Control control)
+        private void DrawMarkers(Graphics graphics, StoryElement element)
         {
-            Rectangle rect = CorrectRect(control);
+            Rectangle rect = CorrectRect(element);
             rect.Inflate(3, 3);
             using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             graphics.DrawRectangle(pen, rect);
             rect.Inflate(3, 3);
-            var list = GetMarkerRectangles(rect, ((StoryElement)control).AutoSize);
+            var list = element.GetSizeMarkerRectangles(rect);
             graphics.FillRectangles(Brushes.White, list);
             graphics.DrawRectangles(Pens.Black, list);
         }
@@ -147,11 +146,11 @@ namespace Stories.Model
                 OnElementMouseClick(e);
 
                 // проверка, что под курсором есть маркер
-                foreach (var control in selected.ToArray().Reverse())
+                foreach (var element in selected.ToArray().Reverse())
                 {
-                    Rectangle rect = CorrectRect(control);
+                    Rectangle rect = CorrectRect(element);
                     rect.Inflate(6, 6);
-                    var list = GetMarkerRectangles(rect, ((StoryElement)control).AutoSize);
+                    var list = element.GetSizeMarkerRectangles(rect);
                     for (var i = 0; i < list.Length; i++)
                     {
                         if (list[i].Contains(e.Location))
@@ -317,7 +316,7 @@ namespace Stories.Model
             }
         }
 
-        private static Rectangle CorrectRect(Control control)
+        private static Rectangle CorrectRect(StoryElement control)
         {
             var rect = control.Bounds;
             rect.Width -= 1;
@@ -327,11 +326,11 @@ namespace Stories.Model
 
         private void MakeCursorAtMarkers(Point location)
         {
-            foreach (var control in selected)
+            foreach (var element in selected)
             {
-                Rectangle rect = CorrectRect(control);
+                Rectangle rect = CorrectRect(element);
                 rect.Inflate(6, 6);
-                var list = GetMarkerRectangles(rect, ((StoryElement)control).AutoSize);
+                var list = element.GetSizeMarkerRectangles(rect);
                 if (list[0].Contains(location) || list[4].Contains(location))
                 {
                     Cursor = Cursors.SizeNWSE;
@@ -368,23 +367,6 @@ namespace Stories.Model
                 }
             }
             Cursor = Cursors.Default;
-        }
-
-        private static Rectangle[] GetMarkerRectangles(Rectangle rect, bool autoSize)
-        {
-            var size = new Size(6, 6);
-            var list = new Rectangle[]
-            {
-                new Rectangle(rect.Location, autoSize ? Size.Empty : size),
-                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y), autoSize ? Size.Empty : size),
-                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y), autoSize ? Size.Empty : size),
-                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + (rect.Height - size.Height) / 2), size),
-                new Rectangle(new Point(rect.X + rect.Width - size.Width, rect.Y + rect.Height - size.Height), autoSize ? Size.Empty : size),
-                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height), autoSize ? Size.Empty : size),
-                new Rectangle(new Point(rect.X, rect.Y + rect.Height - size.Height), autoSize ? Size.Empty : size),
-                new Rectangle(new Point(rect.X, rect.Y + (rect.Height - size.Height) / 2), size),
-            };
-            return list;
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -467,7 +449,7 @@ namespace Stories.Model
         {
             if (keyCode == Keys.Delete)
             {
-                var list = new List<Control>(selected);
+                var list = new List<StoryElement>(selected);
                 var changed = false;
                 foreach (var item in list)
                 {
@@ -496,26 +478,26 @@ namespace Stories.Model
             OnElementClick?.Invoke(this, e);
         }
 
-        public void LoadData(IEnumerable<Control> controls)
+        public void LoadData(IEnumerable<StoryElement> controls)
         {
             elements.Clear();
             elements.AddRange(controls);
             Invalidate();
         }
 
-        public void Add(Control element)
+        public void Add(StoryElement element)
         {
             elements.Add(element);
             Invalidate();
         }
 
-        public void Remove(Control element)
+        public void Remove(StoryElement element)
         {
             elements.Remove(element);
             Invalidate();
         }
 
-        public void Select(Control element)
+        public void Select(StoryElement element)
         {
             if (selected.Contains(element)) return;
             selected.Clear();

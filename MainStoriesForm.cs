@@ -116,7 +116,7 @@ namespace Stories
                 // получаем ссылку на узел дерева, который в свойстве Tag имеет тип контрола
                 var typeNode = (TreeNode)e.Data.GetData(typeof(TreeNode));
                 // создаем контрол из переданного типа
-                var element = (Control)Activator.CreateInstance((Type)typeNode.Tag);
+                var element = (StoryElement)Activator.CreateInstance((Type)typeNode.Tag);
 
                 // располагаем верхний левый угол в точке сбрасывания
                 element.Location = storyPad.PointToClient(new Point(e.X, e.Y));
@@ -193,7 +193,7 @@ namespace Stories
         /// <param name="e"></param>
         private void tvStory_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node != null && e.Node.Tag is Control control)
+            if (e.Node != null && e.Node.Tag is StoryElement control)
             {
                 storyPad.ClearSelection();
                 // если выбор не пуст, то передаем элемент сетке свойств

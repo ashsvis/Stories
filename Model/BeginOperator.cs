@@ -81,6 +81,7 @@ namespace Stories.Model
             using (var path = GetAreaPath())
             {
                 var rect = path.GetBounds();
+                // рисование градиентной заливки
                 var point1 = rect.Location;
                 var point2 = rect.Location;
                 using (var brush = new LinearGradientBrush(PointF.Add(point1, new SizeF(rect.Width / 2, 0)),
@@ -88,9 +89,11 @@ namespace Stories.Model
                                        SystemColors.ControlDark,
                                        SystemColors.ControlLightLight))
                     gr.FillPath(brush, path);
+                // рисование рамки
                 using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.ControlDark))
                     gr.DrawPath(pen, path);
                 rect.Inflate(-3, -3);
+                // рисование текста
                 using (var sf = new StringFormat())
                 {
                     sf.Alignment = StringAlignment.Center;
