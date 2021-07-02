@@ -100,8 +100,8 @@ namespace Stories.Model
                 if (target.Prev == null) continue;
                 var source = target.Prev;
                 e.Graphics.DrawLine(Pens.Red, 
-                    source.GetOutputLinkMarkerRectangles(source.Bounds)[0].Location, 
-                    target.GetInputLinkMarkerRectangles(target.Bounds)[0].Location);
+                    source.GetOutputLinkPoints()[0], 
+                    target.GetInputLinkPoints()[0]);
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -154,17 +154,17 @@ namespace Stories.Model
             rect.Inflate(3, 3);
             using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             graphics.DrawRectangle(pen, rect);
-            rect.Inflate(3, 3);
+            //rect.Inflate(3, 3);
             // маркеры размерные
-            var sizesList = element.GetSizeMarkerRectangles(rect);
+            var sizesList = element.GetSizeMarkerRectangles(); //rect
             graphics.FillRectangles(Brushes.White, sizesList);
             graphics.DrawRectangles(Pens.Black, sizesList);
             // маркеры выходных связей
-            var linkOutList = element.GetOutputLinkMarkerRectangles(rect);
+            var linkOutList = element.GetOutputLinkMarkerRectangles(); //rect
             graphics.FillRectangles(Brushes.Pink, linkOutList);
             graphics.DrawRectangles(Pens.Black, linkOutList);
             // маркеры входных связей
-            var linkInpList = element.GetInputLinkMarkerRectangles(rect);
+            var linkInpList = element.GetInputLinkMarkerRectangles(); //rect
             graphics.FillRectangles(Brushes.Lime, linkInpList);
             graphics.DrawRectangles(Pens.Black, linkInpList);
         }
@@ -194,9 +194,7 @@ namespace Stories.Model
                 // проверка, что под курсором есть маркер подключения связи
                 foreach (var element in elements.ToArray().Reverse())
                 {
-                    Rectangle rect = CorrectRect(element);
-                    rect.Inflate(6, 6);
-                    var list = element.GetOutputLinkMarkerRectangles(rect);
+                    var list = element.GetOutputLinkMarkerRectangles();
                     for (var i = 0; i < list.Length; i++)
                     {
                         if (list[i].Contains(e.Location))
@@ -210,7 +208,7 @@ namespace Stories.Model
                             return;
                         }
                     }
-                    list = element.GetInputLinkMarkerRectangles(rect);
+                    list = element.GetInputLinkMarkerRectangles();
                     for (var i = 0; i < list.Length; i++)
                     {
                         if (list[i].Contains(e.Location))
@@ -229,9 +227,7 @@ namespace Stories.Model
                 // проверка, что под курсором есть маркер изменения размера
                 foreach (var element in selected.ToArray().Reverse())
                 {
-                    Rectangle rect = CorrectRect(element);
-                    rect.Inflate(6, 6);
-                    var list = element.GetSizeMarkerRectangles(rect);
+                    var list = element.GetSizeMarkerRectangles();
                     for (var i = 0; i < list.Length; i++)
                     {
                         if (list[i].Contains(e.Location))
@@ -292,11 +288,9 @@ namespace Stories.Model
                     // проверка, что под курсором есть маркер подключения связи
                     foreach (var element in elements.ToArray().Reverse())
                     {
-                        Rectangle rect = CorrectRect(element);
-                        rect.Inflate(6, 6);
                         var list = workMode == WorkMode.LinkFromInput 
-                            ? element.GetOutputLinkMarkerRectangles(rect)
-                            : element.GetInputLinkMarkerRectangles(rect);
+                            ? element.GetOutputLinkMarkerRectangles()
+                            : element.GetInputLinkMarkerRectangles();
                         for (var i = 0; i < list.Length; i++)
                         {
                             if (list[i].Contains(e.Location))
@@ -449,11 +443,9 @@ namespace Stories.Model
             // проверка на попадание на маркер связи
             foreach (var element in elements)
             {
-                Rectangle rect = CorrectRect(element);
-                rect.Inflate(6, 6);
                 var list = new List<Rectangle>();
-                list.AddRange(element.GetInputLinkMarkerRectangles(rect));
-                list.AddRange(element.GetOutputLinkMarkerRectangles(rect));
+                list.AddRange(element.GetInputLinkMarkerRectangles());
+                list.AddRange(element.GetOutputLinkMarkerRectangles());
                 foreach (var r in list)
                 {
                     if (r.Contains(location))
@@ -466,9 +458,7 @@ namespace Stories.Model
             // проверка на попадание на маркер размера
             foreach (var element in selected)
             {
-                Rectangle rect = CorrectRect(element);
-                rect.Inflate(6, 6);
-                var sizedMarkers = element.GetSizeMarkerRectangles(rect);
+                var sizedMarkers = element.GetSizeMarkerRectangles();
                 if (sizedMarkers[0].Contains(location) || sizedMarkers[4].Contains(location))
                 {
                     Cursor = Cursors.SizeNWSE;
@@ -489,7 +479,7 @@ namespace Stories.Model
                     Cursor = Cursors.SizeWE;
                     return;
                 }
-                else if (rect.Contains(location))
+                else if (element.Bounds.Contains(location))
                 {
                     Cursor = Cursors.SizeAll;
                     return;
@@ -574,26 +564,17 @@ namespace Stories.Model
                     dragRects.Clear();
                     OnElementsChanged();
                 }
-                else if (workMode == WorkMode.LinkFromOutput)
+                else if (workMode == WorkMode.LinkFromOutput || workMode == WorkMode.LinkFromInput)
                 {
                     if (sourceElement != targetElement)
                     {
-                        if (targetElement.Prev == null)
+                        if (targetElement != null && targetElement.Prev == null)
                             targetElement.Prev = sourceElement;
                     }
                     workMode = WorkMode.Default;
                     OnElementsChanged();
                 }
-                else if (workMode == WorkMode.LinkFromInput)
-                {
-                    if (sourceElement != targetElement)
-                    {
-                        if (targetElement.Prev == null)
-                            targetElement.Prev = sourceElement;
-                    }
-                    workMode = WorkMode.Default;
-                    OnElementsChanged();
-                }
+
             exit:
                 workMode = WorkMode.Default;
                 delta = Point.Empty;

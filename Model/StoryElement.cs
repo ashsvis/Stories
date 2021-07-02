@@ -25,9 +25,21 @@ namespace Stories.Model
             }
         }
 
-        public Rectangle[] GetSizeMarkerRectangles(Rectangle rect)
+        protected Size MarkersSize => new(6, 6);
+
+        protected Rectangle CorrectBounds()
         {
-            var size = new Size(6, 6);
+            var rect = this.Bounds;
+            rect.Width -= 1;
+            rect.Height -= 1;
+            rect.Inflate(MarkersSize);
+            return rect;
+        }
+
+        public Rectangle[] GetSizeMarkerRectangles()
+        {
+            var size = MarkersSize;
+            var rect = CorrectBounds();
             var list = new Rectangle[]
             {
                 new Rectangle(rect.Location, AutoSize ? Size.Empty : size),
@@ -42,9 +54,10 @@ namespace Stories.Model
             return list;
         }
 
-        public virtual Rectangle[] GetOutputLinkMarkerRectangles(Rectangle rect)
+        public virtual Rectangle[] GetOutputLinkMarkerRectangles()
         {
-            var size = new Size(6, 6);
+            var size = MarkersSize;
+            var rect = CorrectBounds();
             var list = new Rectangle[]
             {
                 new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height * 2), size)
@@ -52,12 +65,33 @@ namespace Stories.Model
             return list;
         }
 
-        public virtual Rectangle[] GetInputLinkMarkerRectangles(Rectangle rect)
+        public virtual Point[] GetOutputLinkPoints()
         {
-            var size = new Size(6, 6);
+            var rect = this.Bounds;
+            var list = new Point[]
+            {
+                new Point(rect.X + rect.Width / 2, rect.Y + rect.Height)
+            };
+            return list;
+        }
+
+        public virtual Rectangle[] GetInputLinkMarkerRectangles()
+        {
+            var size = MarkersSize;
+            var rect = CorrectBounds();
             var list = new Rectangle[]
             {
                 new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + size.Height), size)
+            };
+            return list;
+        }
+
+        public virtual Point[] GetInputLinkPoints()
+        {
+            var rect = this.Bounds;
+            var list = new Point[]
+            {
+                new Point(rect.X + rect.Width / 2, rect.Y)
             };
             return list;
         }

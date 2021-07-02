@@ -111,9 +111,10 @@ namespace Stories.Model
         /// </summary>
         /// <param name="rect"></param>
         /// <returns></returns>
-        public override Rectangle[] GetOutputLinkMarkerRectangles(Rectangle rect)
+        public override Rectangle[] GetOutputLinkMarkerRectangles()
         {
-            var size = new Size(6, 6);
+            var size = MarkersSize;
+            var rect = CorrectBounds();
             var list = new Rectangle[]
             {
                 new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + size.Height), Size.Empty)
