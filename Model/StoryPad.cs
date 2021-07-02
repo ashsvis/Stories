@@ -99,9 +99,7 @@ namespace Stories.Model
             {
                 if (target.Prev == null) continue;
                 var source = target.Prev;
-                e.Graphics.DrawLine(Pens.Red, 
-                    source.GetOutputLinkPoints()[0], 
-                    target.GetInputLinkPoints()[0]);
+                DrawEdgeLink(e.Graphics, source.GetOutputLinkPoints()[0], target.GetInputLinkPoints()[0]);
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -148,13 +146,36 @@ namespace Stories.Model
             }
         }
 
+        private static void DrawEdgeLink(Graphics graphics, Point sourcePoint, Point targetPoint)
+        {
+            var points = new List<Point>();
+            points.Add(sourcePoint);
+            if (sourcePoint.X != targetPoint.X)
+            {
+                var rect = new Rectangle(Math.Min(sourcePoint.X, targetPoint.X), Math.Min(sourcePoint.Y, targetPoint.Y),
+                                         Math.Abs(sourcePoint.X - targetPoint.X), Math.Abs(sourcePoint.Y - targetPoint.Y));
+                var y = rect.Y + rect.Height / 2;
+                if (sourcePoint.X < targetPoint.X)
+                {
+                    points.Add(new Point(rect.X, y));
+                    points.Add(new Point(rect.X + rect.Width, y));
+                }
+                else
+                {
+                    points.Add(new Point(rect.X + rect.Width, y));
+                    points.Add(new Point(rect.X, y));
+                }
+            }
+            points.Add(targetPoint);
+            graphics.DrawLines(Pens.Red, points.ToArray());
+        }
+
         private void DrawMarkers(Graphics graphics, StoryElement element)
         {
             Rectangle rect = CorrectRect(element);
             rect.Inflate(3, 3);
             using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             graphics.DrawRectangle(pen, rect);
-            //rect.Inflate(3, 3);
             // маркеры размерные
             var sizesList = element.GetSizeMarkerRectangles(); //rect
             graphics.FillRectangles(Brushes.White, sizesList);
