@@ -42,6 +42,13 @@ namespace Stories.Model
             return path;
         }
 
+        [DefaultValue(typeof(Size), "70, 34")]
+        public new Size Size
+        {
+            get => base.Size;
+            set => base.Size = value;
+        }
+
         public static GraphicsPath RoundedRect(RectangleF bounds, int radius)
         {
             int diameter = radius * 2;
@@ -103,8 +110,6 @@ namespace Stories.Model
                 }
             }
         }
-
-        public bool IsEnd { get; set; }
 
         /// <summary>
         /// Запрет маркеров исходящих связей

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Stories.Model
@@ -47,6 +43,13 @@ namespace Stories.Model
             return path;
         }
 
+        [DefaultValue(typeof(Size), "150, 52")]
+        public new Size Size
+        {
+            get => base.Size;
+            set => base.Size = value;
+        }
+
         protected override void CalculateHeight()
         {
             if (!AutoSize) return;
@@ -82,19 +85,6 @@ namespace Stories.Model
                     using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
                         gr.DrawString(Text, Font, brush, rect, sf);
                 }
-                //using (var graphics = this.CreateGraphics())
-                //{
-                //    var yesText = "Да";
-                //    var yesSize = gr.MeasureString(yesText, Font);
-                //    var yesPoint = new PointF(rect.Left + rect.Width - yesSize.Width + 8, rect.Top + rect.Height / 2 - yesSize.Height);
-                //    var noText = "Нет";
-                //    var noSize = gr.MeasureString(noText, Font);
-                //    var noPoint = new PointF(rect.Left + rect.Width / 2, rect.Top + rect.Height - noSize.Height + 8);
-                //    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
-                //            gr.DrawString(yesText, Font, brush, yesPoint);
-                //    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
-                //        gr.DrawString(noText, Font, brush, noPoint);
-                //}
             }
         }
 
@@ -114,5 +104,90 @@ namespace Stories.Model
             };
             return list;
         }
+
+        private Point GetNextYesLinkPoints()
+        {
+            var rect = this.Bounds;
+            return new Point(rect.X + rect.Width, rect.Y + rect.Height / 2);
+        }
+
+        private Point GetNextNoLinkPoints()
+        {
+            var rect = this.Bounds;
+            return new Point(rect.X + rect.Width / 2, rect.Y + rect.Height);
+        }
+
+        private StoryElement NextYes { get; set; }
+
+        private StoryElement NextNo { get; set; }
+
+        public override void DefineTargetLinkTo(StoryElement target, LinkMarkerKind linkedOutputMarker)
+        {
+            if (target == null) return;
+            if (linkedOutputMarker == LinkMarkerKind.YesPath)
+            {
+                if (NextYes != null) return;
+                NextYes = target;
+            }
+            else if (linkedOutputMarker == LinkMarkerKind.NoPath)
+            {
+                if (NextNo != null) return;
+                NextNo = target;
+            }
+        }
+
+        public override void DrawEdgeLinks(Graphics graphics)
+        {
+            if (NextNo != null)
+            {
+                var inputLinkPoint = NextNo.GetInputLinkPoint();
+                DrawDownEdgeLink(graphics, this.GetNextNoLinkPoints(), inputLinkPoint);
+            }
+            if (NextYes != null)
+            {
+                var inputLinkPoint = NextYes.GetInputLinkPoint();
+                DrawRightEdgeLink(graphics, this.GetNextYesLinkPoints(), inputLinkPoint);
+            }
+        }
+
+        private void DrawDownEdgeLink(Graphics graphics, Point srcPoint, Point tarPoint)
+        {
+            var points = new List<Point> { srcPoint };
+            if (srcPoint.X != tarPoint.X)
+            {
+                var rect = new Rectangle(Math.Min(srcPoint.X, tarPoint.X), Math.Min(srcPoint.Y, tarPoint.Y),
+                                         Math.Abs(srcPoint.X - tarPoint.X), Math.Abs(srcPoint.Y - tarPoint.Y));
+                var y = rect.Y + rect.Height / 2;
+                if (srcPoint.X < tarPoint.X)
+                {
+                    points.Add(new Point(rect.X, y));
+                    points.Add(new Point(rect.X + rect.Width, y));
+                }
+                else
+                {
+                    points.Add(new Point(rect.X + rect.Width, y));
+                    points.Add(new Point(rect.X, y));
+                }
+            }
+            points.Add(tarPoint);
+            graphics.DrawLines(Pens.Lime, points.ToArray());
+        }
+
+        private void DrawRightEdgeLink(Graphics graphics, Point srcPoint, Point tarPoint)
+        {
+            var points = new List<Point> { srcPoint };
+            if (srcPoint.X != tarPoint.X)
+            {
+                var rect = new Rectangle(Math.Min(srcPoint.X, tarPoint.X), Math.Min(srcPoint.Y, tarPoint.Y),
+                                         Math.Abs(srcPoint.X - tarPoint.X), Math.Abs(srcPoint.Y - tarPoint.Y));
+                if (srcPoint.X < tarPoint.X)
+                    points.Add(new Point(rect.X + rect.Width, srcPoint.Y));
+                else
+                    points.Add(new Point(rect.X, tarPoint.Y));
+            }
+            points.Add(tarPoint);
+            graphics.DrawLines(Pens.Pink, points.ToArray());
+        }
+
     }
 }

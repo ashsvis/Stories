@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace Stories.Model
@@ -12,7 +11,7 @@ namespace Stories.Model
     {
         protected virtual void TuningControl()
         {
-            Size = new Size(70, 25);
+            Size = new Size(70, 34);
             Text = "Начало";
         }
 
@@ -41,6 +40,13 @@ namespace Stories.Model
             var rect = new RectangleF(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
             path.AddPath(RoundedRect(rect, Math.Min(Width / 2, Height / 2)), true);
             return path;
+        }
+
+        [DefaultValue(typeof(Size), "70, 34")]
+        public new Size Size 
+        {
+            get => base.Size;
+            set => base.Size = value; 
         }
 
         public static GraphicsPath RoundedRect(RectangleF bounds, int radius)
@@ -104,8 +110,6 @@ namespace Stories.Model
                 }
             }
         }
-
-        public bool IsEnd { get; set; }
 
         /// <summary>
         /// Запрет маркеров входящих связей

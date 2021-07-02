@@ -31,13 +31,6 @@ namespace Stories.Model
             Left = 7
         }
 
-        enum LinkMarkerKind
-        {
-            None = -1,
-            YesPath = 0,
-            NoPath = 1,
-        }
-
         private Rectangle ribbonRect;
         private Point[] ribbonLine = new Point[2];
         private Point mouseDownLocation;
@@ -95,11 +88,9 @@ namespace Stories.Model
             }
 
             // рисование связей между элементами
-            foreach (var target in elements.Where(item => item.Visible && workMode != WorkMode.Drag))
+            foreach (var element in elements.Where(item => item.Visible && workMode != WorkMode.Drag))
             {
-                if (target.Prev == null) continue;
-                var source = target.Prev;
-                DrawEdgeLink(e.Graphics, source.GetOutputLinkPoints()[0], target.GetInputLinkPoints()[0]);
+                element.DrawEdgeLinks(e.Graphics);
             }
 
             // рисование маркеров размеров у выбранных элементов
@@ -146,46 +137,22 @@ namespace Stories.Model
             }
         }
 
-        private static void DrawEdgeLink(Graphics graphics, Point sourcePoint, Point targetPoint)
-        {
-            var points = new List<Point>();
-            points.Add(sourcePoint);
-            if (sourcePoint.X != targetPoint.X)
-            {
-                var rect = new Rectangle(Math.Min(sourcePoint.X, targetPoint.X), Math.Min(sourcePoint.Y, targetPoint.Y),
-                                         Math.Abs(sourcePoint.X - targetPoint.X), Math.Abs(sourcePoint.Y - targetPoint.Y));
-                var y = rect.Y + rect.Height / 2;
-                if (sourcePoint.X < targetPoint.X)
-                {
-                    points.Add(new Point(rect.X, y));
-                    points.Add(new Point(rect.X + rect.Width, y));
-                }
-                else
-                {
-                    points.Add(new Point(rect.X + rect.Width, y));
-                    points.Add(new Point(rect.X, y));
-                }
-            }
-            points.Add(targetPoint);
-            graphics.DrawLines(Pens.Red, points.ToArray());
-        }
-
-        private void DrawMarkers(Graphics graphics, StoryElement element)
+        private static void DrawMarkers(Graphics graphics, StoryElement element)
         {
             Rectangle rect = CorrectRect(element);
             rect.Inflate(3, 3);
             using var pen = new Pen(Color.Black) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot };
             graphics.DrawRectangle(pen, rect);
             // маркеры размерные
-            var sizesList = element.GetSizeMarkerRectangles(); //rect
+            var sizesList = element.GetSizeMarkerRectangles();
             graphics.FillRectangles(Brushes.White, sizesList);
             graphics.DrawRectangles(Pens.Black, sizesList);
             // маркеры выходных связей
-            var linkOutList = element.GetOutputLinkMarkerRectangles(); //rect
+            var linkOutList = element.GetOutputLinkMarkerRectangles();
             graphics.FillRectangles(Brushes.Pink, linkOutList);
             graphics.DrawRectangles(Pens.Black, linkOutList);
             // маркеры входных связей
-            var linkInpList = element.GetInputLinkMarkerRectangles(); //rect
+            var linkInpList = element.GetInputLinkMarkerRectangles();
             graphics.FillRectangles(Brushes.Lime, linkInpList);
             graphics.DrawRectangles(Pens.Black, linkInpList);
         }
@@ -322,10 +289,7 @@ namespace Stories.Model
                                     sourceElement = element;
                                 }
                                 else
-                                {
-                                    linkedOutputMarker = (LinkMarkerKind)i;
                                     targetElement = element;
-                                }
                                 if (sourceElement != targetElement)
                                     Cursor = Cursors.Cross;
                                 else
@@ -585,17 +549,14 @@ namespace Stories.Model
                     dragRects.Clear();
                     OnElementsChanged();
                 }
-                else if (workMode == WorkMode.LinkFromOutput || workMode == WorkMode.LinkFromInput)
+                else if (workMode == WorkMode.LinkFromOutput || 
+                         workMode == WorkMode.LinkFromInput)
                 {
                     if (sourceElement != targetElement)
-                    {
-                        if (targetElement != null && targetElement.Prev == null)
-                            targetElement.Prev = sourceElement;
-                    }
+                        sourceElement?.DefineTargetLinkTo(targetElement, linkedOutputMarker);
                     workMode = WorkMode.Default;
                     OnElementsChanged();
                 }
-
             exit:
                 workMode = WorkMode.Default;
                 delta = Point.Empty;

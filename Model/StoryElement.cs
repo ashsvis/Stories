@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -25,7 +26,7 @@ namespace Stories.Model
             }
         }
 
-        protected Size MarkersSize => new(6, 6);
+        protected static Size MarkersSize => new(6, 6);
 
         protected Rectangle CorrectBounds()
         {
@@ -58,47 +59,69 @@ namespace Stories.Model
         {
             var size = MarkersSize;
             var rect = CorrectBounds();
-            var list = new Rectangle[]
-            {
-                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height * 2), size)
-            };
+            var list = new Rectangle[] { new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height * 2), size) };
             return list;
         }
 
-        public virtual Point[] GetOutputLinkPoints()
+        private Point[] GetOutputLinkPoints()
         {
             var rect = this.Bounds;
-            var list = new Point[]
-            {
-                new Point(rect.X + rect.Width / 2, rect.Y + rect.Height)
-            };
+            var list = new Point[] { new Point(rect.X + rect.Width / 2, rect.Y + rect.Height) };
             return list;
+        }
+
+        public virtual void DrawEdgeLinks(Graphics graphics)
+        {
+            if (Next == null) return;
+            foreach (var point in this.GetOutputLinkPoints())
+                DrawEdgeLink(graphics, point, Next.GetInputLinkPoint());
+        }
+
+        private static void DrawEdgeLink(Graphics graphics, Point sourcePoint, Point targetPoint)
+        {
+            var points = new List<Point> { sourcePoint };
+            if (sourcePoint.X != targetPoint.X)
+            {
+                var rect = new Rectangle(Math.Min(sourcePoint.X, targetPoint.X), Math.Min(sourcePoint.Y, targetPoint.Y),
+                                         Math.Abs(sourcePoint.X - targetPoint.X), Math.Abs(sourcePoint.Y - targetPoint.Y));
+                var y = rect.Y + rect.Height / 2;
+                if (sourcePoint.X < targetPoint.X)
+                {
+                    points.Add(new Point(rect.X, y));
+                    points.Add(new Point(rect.X + rect.Width, y));
+                }
+                else
+                {
+                    points.Add(new Point(rect.X + rect.Width, y));
+                    points.Add(new Point(rect.X, y));
+                }
+            }
+            points.Add(targetPoint);
+            graphics.DrawLines(Pens.Red, points.ToArray());
         }
 
         public virtual Rectangle[] GetInputLinkMarkerRectangles()
         {
             var size = MarkersSize;
             var rect = CorrectBounds();
-            var list = new Rectangle[]
-            {
-                new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + size.Height), size)
-            };
+            var list = new Rectangle[] { new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + size.Height), size) };
             return list;
         }
 
-        public virtual Point[] GetInputLinkPoints()
+        public Point GetInputLinkPoint()
         {
             var rect = this.Bounds;
-            var list = new Point[]
-            {
-                new Point(rect.X + rect.Width / 2, rect.Y)
-            };
-            return list;
+            return new Point(rect.X + rect.Width / 2, rect.Y);
         }
 
-        public StoryElement Prev { get; set; }
+        private StoryElement Next { get; set; }
 
-        public StoryElement[] Nexts { get; set; }
+        public virtual void DefineTargetLinkTo(StoryElement target, LinkMarkerKind _)
+        {
+            if (target == null) return;
+            if (Next != null) return;
+            Next = target;
+        }
 
         [Browsable(true), DefaultValue(true)]
         public new bool AutoSize
