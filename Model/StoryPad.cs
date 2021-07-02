@@ -83,15 +83,7 @@ namespace Stories.Model
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            // рисование связей между элементами
-            foreach (var target in elements.Where(item => item.Visible && workMode != WorkMode.Drag))
-            {
-                if (target.Prev == null) continue;
-                var source = target.Prev;
-                e.Graphics.DrawLine(Pens.Red, 
-                    source.GetOutputLinkMarkerRectangles(source.Bounds)[0].Location, 
-                    target.GetInputLinkMarkerRectangles(target.Bounds)[0].Location);
-            }
+
             // рисование элементов, размещенных на поверхности
             foreach (var element in elements.Where(item => item.Visible && 
                 (workMode != WorkMode.Drag || workMode == WorkMode.Drag && !selected.Contains(item))))
@@ -100,6 +92,16 @@ namespace Stories.Model
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 element.DrawToBitmap(bmp, element.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);     
+            }
+
+            // рисование связей между элементами
+            foreach (var target in elements.Where(item => item.Visible && workMode != WorkMode.Drag))
+            {
+                if (target.Prev == null) continue;
+                var source = target.Prev;
+                e.Graphics.DrawLine(Pens.Red, 
+                    source.GetOutputLinkMarkerRectangles(source.Bounds)[0].Location, 
+                    target.GetInputLinkMarkerRectangles(target.Bounds)[0].Location);
             }
 
             // рисование маркеров размеров у выбранных элементов
