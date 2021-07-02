@@ -553,7 +553,12 @@ namespace Stories.Model
                          workMode == WorkMode.LinkFromInput)
                 {
                     if (sourceElement != targetElement)
-                        sourceElement?.DefineTargetLinkTo(targetElement, linkedOutputMarker);
+                    {
+                        if (workMode == WorkMode.LinkFromOutput)
+                            sourceElement?.DefineTargetLinkTo(targetElement, linkedOutputMarker);
+                        if (workMode == WorkMode.LinkFromInput)
+                            sourceElement?.DefineTargetLinkTo(targetElement, linkedInputMarker);
+                    }
                     workMode = WorkMode.Default;
                     OnElementsChanged();
                 }
