@@ -97,7 +97,7 @@ namespace Stories.Model
                 }
             }
             points.Add(targetPoint);
-            graphics.DrawLines(Pens.Red, points.ToArray());
+            graphics.DrawLines(Pens.Black, points.ToArray());
         }
 
         public virtual Rectangle[] GetInputLinkMarkerRectangles()

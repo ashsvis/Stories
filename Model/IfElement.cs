@@ -85,6 +85,8 @@ namespace Stories.Model
                     using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
                         gr.DrawString(Text, Font, brush, rect, sf);
                 }
+                if (NextYes == null)
+                    DrawYesText(gr, new Point((int)(rect.X + rect.Width - 15), (int)(rect.Y + rect.Height / 2 - 3)));
             }
         }
 
@@ -170,7 +172,8 @@ namespace Stories.Model
                 }
             }
             points.Add(tarPoint);
-            graphics.DrawLines(Pens.Lime, points.ToArray());
+            graphics.DrawLines(Pens.Black, points.ToArray());
+            DrawNoText(graphics, srcPoint);
         }
 
         private void DrawRightEdgeLink(Graphics graphics, Point srcPoint, Point tarPoint)
@@ -183,11 +186,38 @@ namespace Stories.Model
                 if (srcPoint.X < tarPoint.X)
                     points.Add(new Point(rect.X + rect.Width, srcPoint.Y));
                 else
-                    points.Add(new Point(rect.X, tarPoint.Y));
+                {
+                    var y = rect.Y + rect.Height / 2;
+                    points.Add(new Point(rect.X + rect.Width, y));
+                    points.Add(new Point(rect.X, y));
+                }
             }
             points.Add(tarPoint);
-            graphics.DrawLines(Pens.Pink, points.ToArray());
+            graphics.DrawLines(Pens.Black, points.ToArray());
+            DrawYesText(graphics, srcPoint);
         }
 
+        [DefaultValue("Да")]
+        public string TextForYes { get; set; } = "Да";
+
+        private void DrawYesText(Graphics graphics, Point srcPoint)
+        {
+            var text = TextForYes;
+            var size = graphics.MeasureString(text, Font);
+            var pt = srcPoint;
+            pt.Offset(0, -(int)size.Height);
+            using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
+                graphics.DrawString(text, Font, brush, pt);
+        }
+
+        [DefaultValue("Нет")]
+        public string TextForNo { get; set; } = "Нет";
+
+        private void DrawNoText(Graphics graphics, Point srcPoint)
+        {
+            var text = TextForNo;
+            using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
+                graphics.DrawString(text, Font, brush, srcPoint);
+        }
     }
 }
