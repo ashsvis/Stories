@@ -102,7 +102,7 @@ namespace Stories.Model
             DrawArrow(graphics, points[^2], points[^1]);
         }
 
-        protected static void DrawArrow(Graphics graphics, PointF prevPoint, PointF endPoint)
+        public static void DrawArrow(Graphics graphics, PointF prevPoint, PointF endPoint, Pen linePen = null)
         {
             //расчёт точек стрелки
             var HeadWidth = 10f; // Длина ребер стрелки
@@ -118,8 +118,10 @@ namespace Stories.Model
                                  (float)(endPoint.Y - (HeadHeight * cost - HeadWidth * sint)));
             var arrow = new PointF[] { pt1, pt2, endPoint, pt1, pt2 };
 
-            graphics.FillPolygon(Brushes.Black, arrow);
-            graphics.DrawLines(Pens.Black, arrow);
+            var color = linePen != null ? linePen.Color : Color.Black;
+            using (var brush = new SolidBrush(color))
+                graphics.FillPolygon(brush, arrow);
+            graphics.DrawLines(linePen ?? Pens.Black, arrow);
         }
 
 

@@ -131,9 +131,12 @@ namespace Stories.Model
             // рисование резиновой линии связи в режиме определения связей
             if (workMode == WorkMode.LinkFromInput || workMode == WorkMode.LinkFromOutput)
             {
-                using var linePen = new Pen(Color.Gray, 2) 
-                { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                //using var linePen = new Pen(Color.Gray, 2) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                var linePen = Pens.Black;
                 e.Graphics.DrawLines(linePen, ribbonLine);
+                var pt0 = workMode == WorkMode.LinkFromOutput ? ribbonLine[0]: ribbonLine[1];
+                var pt1 = workMode == WorkMode.LinkFromOutput ? ribbonLine[1] : ribbonLine[0];
+                StoryElement.DrawArrow(e.Graphics, pt0, pt1, linePen);
             }
         }
 
