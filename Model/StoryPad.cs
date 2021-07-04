@@ -77,6 +77,12 @@ namespace Stories.Model
         {
             base.OnPaint(e);
 
+            // рисование связей между элементами
+            foreach (var element in elements.Where(item => item.Visible /* && workMode != WorkMode.Drag */))
+            {
+                element.DrawEdgeLinks(e.Graphics);
+            }
+
             // рисование элементов, размещенных на поверхности
             foreach (var element in elements.Where(item => item.Visible && 
                 (workMode != WorkMode.Drag || workMode == WorkMode.Drag && !selected.Contains(item))))
@@ -85,12 +91,6 @@ namespace Stories.Model
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
                 element.DrawToBitmap(bmp, element.ClientRectangle);
                 e.Graphics.DrawImage(bmp, bounds);     
-            }
-
-            // рисование связей между элементами
-            foreach (var element in elements.Where(item => item.Visible && workMode != WorkMode.Drag))
-            {
-                element.DrawEdgeLinks(e.Graphics);
             }
 
             // рисование маркеров размеров у выбранных элементов
