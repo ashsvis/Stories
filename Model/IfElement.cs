@@ -173,6 +173,7 @@ namespace Stories.Model
             }
             points.Add(tarPoint);
             graphics.DrawLines(Pens.Black, points.ToArray());
+            DrawArrow(graphics, points[^2], points[^1]);
             DrawNoText(graphics, srcPoint);
         }
 
@@ -194,6 +195,7 @@ namespace Stories.Model
             }
             points.Add(tarPoint);
             graphics.DrawLines(Pens.Black, points.ToArray());
+            DrawArrow(graphics, points[^2], points[^1]);
             DrawYesText(graphics, srcPoint);
         }
 

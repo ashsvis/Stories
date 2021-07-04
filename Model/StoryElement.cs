@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Stories.Model
@@ -98,7 +99,29 @@ namespace Stories.Model
             }
             points.Add(targetPoint);
             graphics.DrawLines(Pens.Black, points.ToArray());
+            DrawArrow(graphics, points[^2], points[^1]);
         }
+
+        protected static void DrawArrow(Graphics graphics, PointF prevPoint, PointF endPoint)
+        {
+            //расчёт точек стрелки
+            var HeadWidth = 10f; // Длина ребер стрелки
+            var HeadHeight = 3f; // Ширина между ребрами стрелки
+
+            var theta = Math.Atan2(prevPoint.Y - endPoint.Y, prevPoint.X - endPoint.X);
+            var sint = Math.Sin(theta);
+            var cost = Math.Cos(theta);
+
+            var pt1 = new PointF((float)(endPoint.X + (HeadWidth * cost - HeadHeight * sint)),
+                                 (float)(endPoint.Y + (HeadWidth * sint + HeadHeight * cost)));
+            var pt2 = new PointF((float)(endPoint.X + (HeadWidth * cost + HeadHeight * sint)),
+                                 (float)(endPoint.Y - (HeadHeight * cost - HeadWidth * sint)));
+            var arrow = new PointF[] { pt1, pt2, endPoint, pt1, pt2 };
+
+            graphics.FillPolygon(Brushes.Black, arrow);
+            graphics.DrawLines(Pens.Black, arrow);
+        }
+
 
         public virtual Rectangle[] GetInputLinkMarkerRectangles()
         {
