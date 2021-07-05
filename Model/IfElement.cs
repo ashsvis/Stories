@@ -130,12 +130,23 @@ namespace Stories.Model
             {
                 if (NextYes != null) return;
                 NextYes = target;
+                target.DefineSourceLinkFrom(this, linkedOutputMarker);
             }
             else if (linkedOutputMarker == LinkMarkerKind.NoPath)
             {
                 if (NextNo != null) return;
                 NextNo = target;
+                target.DefineSourceLinkFrom(this, linkedOutputMarker);
             }
+        }
+
+        public override bool IsOutputBusy(LinkMarkerKind linkedOutputMarker)
+        {
+            if (linkedOutputMarker == LinkMarkerKind.YesPath)
+                return NextYes != null;
+            else if (linkedOutputMarker == LinkMarkerKind.NoPath)
+                return NextNo != null;
+            return false;
         }
 
         public override void DrawEdgeLinks(Graphics graphics)

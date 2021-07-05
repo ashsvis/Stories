@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Stories.Model
@@ -141,11 +140,21 @@ namespace Stories.Model
 
         private StoryElement Next { get; set; }
 
+        private StoryElement Prev { get; set; }
+
         public virtual void DefineTargetLinkTo(StoryElement target, LinkMarkerKind _)
         {
             if (target == null) return;
             if (Next != null) return;
             Next = target;
+            target.DefineSourceLinkFrom(this, _);
+        }
+
+        public virtual void DefineSourceLinkFrom(StoryElement source, LinkMarkerKind _)
+        {
+            if (source == null) return;
+            if (Prev != null) return;
+            Prev = source;
         }
 
         [Browsable(true), DefaultValue(true)]
@@ -192,5 +201,15 @@ namespace Stories.Model
 
         [Browsable(false)]
         public override ContextMenuStrip ContextMenuStrip { get => base.ContextMenuStrip; set => base.ContextMenuStrip = value; }
+
+        public virtual bool IsOutputBusy(LinkMarkerKind _)
+        {
+            return Next != null;
+        }
+
+        public virtual bool IsInputBusy(LinkMarkerKind _)
+        {
+            return Prev != null;
+        }
     }
 }

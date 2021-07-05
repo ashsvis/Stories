@@ -190,11 +190,13 @@ namespace Stories.Model
                     {
                         if (list[i].Contains(e.Location))
                         {
+                            linkedOutputMarker = (LinkMarkerKind)i;
+                            if (element.IsOutputBusy(linkedOutputMarker))
+                                return;
                             workMode = WorkMode.LinkFromOutput;
                             var pt = list[i].Location;
                             pt.Offset(list[i].Size.Width / 2, list[i].Size.Height / 2);
                             mouseDownLocation = pt;
-                            linkedOutputMarker = (LinkMarkerKind)i;
                             sourceElement = element;
                             return;
                         }
@@ -204,11 +206,13 @@ namespace Stories.Model
                     {
                         if (list[i].Contains(e.Location))
                         {
+                            linkedInputMarker = (LinkMarkerKind)i;
+                            if (element.IsInputBusy(linkedInputMarker))
+                                return;
                             workMode = WorkMode.LinkFromInput;
                             var pt = list[i].Location;
                             pt.Offset(list[i].Size.Width / 2, list[i].Size.Height / 2);
                             mouseDownLocation = pt;
-                            linkedInputMarker = (LinkMarkerKind)i;
                             targetElement = element;
                             return;
                         }
@@ -297,6 +301,7 @@ namespace Stories.Model
                                     Cursor = Cursors.Cross;
                                 else
                                     Cursor = Cursors.No;
+                                Invalidate();
                                 return;
                             }
                         }
@@ -331,90 +336,95 @@ namespace Stories.Model
                 }
                 if (workMode == WorkMode.Resize)
                 {
-                    dragRects.Clear();
-                    IEnumerable<Rectangle> rects;
-                    const int minWidth = 5;
-                    const int minHeight = 5;
-                    var dw = selected.Min(item => item.Width) - minWidth;
-                    var dh = selected.Min(item => item.Height) - minHeight;
-                    switch (resizedMarker)
-                    {
-                        case SizeMarkerKind.TopLeft:
-                            rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + delta.Y, item.Width - delta.X, item.Height - delta.Y));
-                            if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
-                                dragRects.AddRange(rects);
-                            else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + dh, item.Width - delta.X, item.Height - dh)));
-                            else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + delta.Y, item.Width - dw, item.Height - delta.Y)));
-                            else
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + dh, item.Width - dw, item.Height - dh)));
-                            Cursor = Cursors.SizeNWSE;
-                            break;
-                        case SizeMarkerKind.Top:
-                            rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width, item.Height - delta.Y));
-                            dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects 
-                                : selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width, item.Height - dh)));
-                            Cursor = Cursors.SizeNS;
-                            break;
-                        case SizeMarkerKind.TopRight:
-                            rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width + delta.X, item.Height - delta.Y));
-                            if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
-                                dragRects.AddRange(rects);
-                            else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width + delta.X, item.Height - dh)));
-                            else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width - dw, item.Height - delta.Y)));
-                            else
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width - dw, item.Height - dh)));
-                            Cursor = Cursors.SizeNESW;
-                            break;
-                        case SizeMarkerKind.Right:
-                            rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height));
-                            dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects 
-                                : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height)));
-                            Cursor = Cursors.SizeWE;
-                            break;
-                        case SizeMarkerKind.BottomRight:
-                            rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height + delta.Y));
-                            if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
-                                dragRects.AddRange(rects);
-                            else if(rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height - dh)));
-                            else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height + delta.Y)));
-                            else
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height - dh)));
-                            Cursor = Cursors.SizeNWSE;
-                            break;
-                        case SizeMarkerKind.Bottom:
-                            rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height + delta.Y));
-                            dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects 
-                                : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height - dh)));
-                            Cursor = Cursors.SizeNS;
-                            break;
-                        case SizeMarkerKind.BottomLeft:
-                            rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height + delta.Y));
-                            if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
-                                dragRects.AddRange(rects);
-                            else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height - dh)));
-                            else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height + delta.Y)));
-                            else
-                                dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height - dh)));
-                            Cursor = Cursors.SizeNESW;
-                            break;
-                        case SizeMarkerKind.Left:
-                            rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height));
-                            dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects 
-                                : selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height)));
-                            Cursor = Cursors.SizeWE;
-                            break;
-                    }
+                    DoResizeModeWhenMove();
                 }
                 // запрашиваем, чтобы обновился
                 Invalidate();
+            }
+        }
+
+        private void DoResizeModeWhenMove()
+        {
+            dragRects.Clear();
+            IEnumerable<Rectangle> rects;
+            const int minWidth = 5;
+            const int minHeight = 5;
+            var dw = selected.Min(item => item.Width) - minWidth;
+            var dh = selected.Min(item => item.Height) - minHeight;
+            switch (resizedMarker)
+            {
+                case SizeMarkerKind.TopLeft:
+                    rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + delta.Y, item.Width - delta.X, item.Height - delta.Y));
+                    if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
+                        dragRects.AddRange(rects);
+                    else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top + dh, item.Width - delta.X, item.Height - dh)));
+                    else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + delta.Y, item.Width - dw, item.Height - delta.Y)));
+                    else
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top + dh, item.Width - dw, item.Height - dh)));
+                    Cursor = Cursors.SizeNWSE;
+                    break;
+                case SizeMarkerKind.Top:
+                    rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width, item.Height - delta.Y));
+                    dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects
+                        : selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width, item.Height - dh)));
+                    Cursor = Cursors.SizeNS;
+                    break;
+                case SizeMarkerKind.TopRight:
+                    rects = selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width + delta.X, item.Height - delta.Y));
+                    if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
+                        dragRects.AddRange(rects);
+                    else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width + delta.X, item.Height - dh)));
+                    else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + delta.Y, item.Width - dw, item.Height - delta.Y)));
+                    else
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top + dh, item.Width - dw, item.Height - dh)));
+                    Cursor = Cursors.SizeNESW;
+                    break;
+                case SizeMarkerKind.Right:
+                    rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height));
+                    dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects
+                        : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height)));
+                    Cursor = Cursors.SizeWE;
+                    break;
+                case SizeMarkerKind.BottomRight:
+                    rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height + delta.Y));
+                    if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
+                        dragRects.AddRange(rects);
+                    else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width + delta.X, item.Height - dh)));
+                    else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height + delta.Y)));
+                    else
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left, item.Top, item.Width - dw, item.Height - dh)));
+                    Cursor = Cursors.SizeNWSE;
+                    break;
+                case SizeMarkerKind.Bottom:
+                    rects = selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height + delta.Y));
+                    dragRects.AddRange(rects.All(r => r.Height > minHeight) ? rects
+                        : selected.Select(item => new Rectangle(item.Left, item.Top, item.Width, item.Height - dh)));
+                    Cursor = Cursors.SizeNS;
+                    break;
+                case SizeMarkerKind.BottomLeft:
+                    rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height + delta.Y));
+                    if (rects.All(r => r.Height > minHeight && r.Width > minWidth))
+                        dragRects.AddRange(rects);
+                    else if (rects.All(r => r.Width > minWidth) && rects.Any(r => r.Height <= minHeight))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height - dh)));
+                    else if (rects.All(r => r.Height > minHeight) && rects.Any(r => r.Width <= minWidth))
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height + delta.Y)));
+                    else
+                        dragRects.AddRange(selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height - dh)));
+                    Cursor = Cursors.SizeNESW;
+                    break;
+                case SizeMarkerKind.Left:
+                    rects = selected.Select(item => new Rectangle(item.Left + delta.X, item.Top, item.Width - delta.X, item.Height));
+                    dragRects.AddRange(rects.All(r => r.Width > minWidth) ? rects
+                        : selected.Select(item => new Rectangle(item.Left + dw, item.Top, item.Width - dw, item.Height)));
+                    Cursor = Cursors.SizeWE;
+                    break;
             }
         }
 
@@ -555,15 +565,38 @@ namespace Stories.Model
                 else if (workMode == WorkMode.LinkFromOutput || 
                          workMode == WorkMode.LinkFromInput)
                 {
-                    if (sourceElement != targetElement)
+                    // проверка, что под курсором есть маркер подключения связи
+                    foreach (var element in elements.ToArray().Reverse())
                     {
-                        if (workMode == WorkMode.LinkFromOutput)
-                            sourceElement?.DefineTargetLinkTo(targetElement, linkedOutputMarker);
-                        if (workMode == WorkMode.LinkFromInput)
-                            sourceElement?.DefineTargetLinkTo(targetElement, linkedInputMarker);
+                        var list = workMode == WorkMode.LinkFromInput
+                            ? element.GetOutputLinkMarkerRectangles()
+                            : element.GetInputLinkMarkerRectangles();
+                        for (var i = 0; i < list.Length; i++)
+                        {
+                            if (list[i].Contains(e.Location))
+                            {
+                                if (workMode == WorkMode.LinkFromInput)
+                                {
+                                    linkedInputMarker = (LinkMarkerKind)i;
+                                    sourceElement = element;
+                                }
+                                else
+                                    targetElement = element;
+                                if (sourceElement != targetElement)
+                                {
+                                    if (workMode == WorkMode.LinkFromOutput)
+                                        sourceElement?.DefineTargetLinkTo(targetElement, linkedOutputMarker);
+                                    if (workMode == WorkMode.LinkFromInput)
+                                        sourceElement?.DefineTargetLinkTo(targetElement, linkedInputMarker);
+
+                                    workMode = WorkMode.Default;
+                                    OnElementsChanged();
+                                    goto exit;
+                                }
+                                return;
+                            }
+                        }
                     }
-                    workMode = WorkMode.Default;
-                    OnElementsChanged();
                 }
             exit:
                 workMode = WorkMode.Default;
