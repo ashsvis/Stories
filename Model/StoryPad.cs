@@ -78,14 +78,13 @@ namespace Stories.Model
             base.OnPaint(e);
 
             // рисование связей между элементами
-            foreach (var element in elements.Where(item => item.Visible /* && workMode != WorkMode.Drag */))
+            foreach (var element in elements.Where(item => item.Visible))
             {
                 element.DrawEdgeLinks(e.Graphics);
             }
 
             // рисование элементов, размещенных на поверхности
-            foreach (var element in elements.Where(item => item.Visible && 
-                (workMode != WorkMode.Drag || workMode == WorkMode.Drag && !selected.Contains(item))))
+            foreach (var element in elements.Where(item => item.Visible))
             {
                 var bounds = element.Bounds;
                 using var bmp = new Bitmap(bounds.Width, bounds.Height);
