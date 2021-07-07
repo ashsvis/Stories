@@ -1,29 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace Stories.Model
 {
     [Serializable]
-    public abstract class StoryElement : Control
+    public abstract class StoryElement
     {
         public StoryElement()
         {
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
-            base.AutoSize = true;
+            AutoSize = true;
         }
+
+        public string Text { get; set; }
+
+        public int Width { get; set; }
+        public int Height { get; set; }
+
+        public Size Size
+        {
+            get { return new(Width, Height); }
+            set 
+            {
+                Width = value.Width;
+                Height = value.Height;
+            }
+        }
+
+        public int Left { get; set; }
+        public int Top { get; set; }
+
+        public Point Location
+        {
+            get { return new(Left, Top); }
+            set
+            {
+                Left = value.X;
+                Top = value.Y;
+            }
+        }
+
+        public bool Enabled { get; set; } = true;
+
+        public bool Visible { get; set; } = true;
+
+        public Font Font { get; set; } = SystemFonts.CaptionFont;
+
+        public Rectangle Bounds { get => new(Left, Top, Width, Height); }
+
+        public Rectangle ClientRectangle { get => new(0, 0, Width - 1, Height - 1); }
 
         protected virtual void CalculateHeight()
         {
             if (!AutoSize) return;
             var text = string.IsNullOrWhiteSpace(Text) ? "Strory Element" : Text;
-            using (var graphics = this.CreateGraphics())
-            {
-                var size = graphics.MeasureString(text, Font, Width - 7);
-                Height = (int)(size.Height * 2);
-            }
+            using var image = new Bitmap(100, 100);
+            using var graphics = Graphics.FromImage(image);
+            var size = graphics.MeasureString(text, Font, Width - 7);
+            Height = (int)(size.Height * 2);
         }
 
         protected static Size MarkersSize => new(6, 6);
@@ -61,6 +96,12 @@ namespace Stories.Model
             var rect = CorrectBounds();
             var list = new Rectangle[] { new Rectangle(new Point(rect.X + (rect.Width - size.Width) / 2, rect.Y + rect.Height - size.Height * 2), size) };
             return list;
+        }
+
+        public void DrawToBitmap(Bitmap image, Rectangle clientRectangle)
+        {
+            using var graphics = Graphics.FromImage(image);
+            OnPaint(new PaintEventArgs(graphics, clientRectangle));
         }
 
         private Point[] GetOutputLinkPoints()
@@ -123,7 +164,6 @@ namespace Stories.Model
             graphics.DrawLines(linePen ?? Pens.Black, arrow);
         }
 
-
         public virtual Rectangle[] GetInputLinkMarkerRectangles()
         {
             var size = MarkersSize;
@@ -157,50 +197,20 @@ namespace Stories.Model
             Prev = source;
         }
 
-        [Browsable(true), DefaultValue(true)]
-        public new bool AutoSize
+        private bool autoSize;
+
+        public bool AutoSize
         {
-            get { return base.AutoSize; }
-            set
+            get { return autoSize; }
+            set 
             {
-                if (base.AutoSize == value) return;
-                base.AutoSize = value;
+                if (autoSize == value) return;
+                autoSize = value;
                 CalculateHeight();
             }
         }
 
-        protected override void OnFontChanged(EventArgs e)
-        {
-            base.OnFontChanged(e);
-            CalculateHeight();
-        }
-
-        protected override void OnTextChanged(EventArgs e)
-        {
-            base.OnTextChanged(e);
-            CalculateHeight();
-        }
-
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            base.OnSizeChanged(e);
-            CalculateHeight();
-        }
-
-        [Browsable(false)]
-        public override AnchorStyles Anchor { get => base.Anchor; set => base.Anchor = value; }
-
-        [Browsable(false)]
-        public override Cursor Cursor { get => base.Cursor; set => base.Cursor = value; }
-
-        [Browsable(false)]
-        public override DockStyle Dock { get => base.Dock; set => base.Dock = value; }
-
-        [Browsable(false)]
-        public override bool AllowDrop { get => base.AllowDrop; set => base.AllowDrop = value; }
-
-        [Browsable(false)]
-        public override ContextMenuStrip ContextMenuStrip { get => base.ContextMenuStrip; set => base.ContextMenuStrip = value; }
+        protected abstract void OnPaint(PaintEventArgs e);
 
         public virtual bool IsOutputBusy(LinkMarkerKind _)
         {

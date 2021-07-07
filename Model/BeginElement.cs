@@ -17,27 +17,13 @@ namespace Stories.Model
 
         public BeginElement()
         {
-            InitializeComponent();
             TuningControl();
-        }
-
-        public BeginElement(IContainer container)
-        {
-            container.Add(this);
-
-            InitializeComponent();
-            TuningControl();
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
         }
 
         private GraphicsPath GetAreaPath()
         {
             var path = new GraphicsPath();
-            var rect = new RectangleF(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
+            var rect = ClientRectangle;
             path.AddPath(RoundedRect(rect, Math.Min(Width / 2, Height / 2)), true);
             return path;
         }
@@ -83,32 +69,27 @@ namespace Stories.Model
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            base.OnPaint(e);
             var gr = e.Graphics;
-            using (var path = GetAreaPath())
-            {
-                var rect = path.GetBounds();
-                // рисование градиентной заливки
-                var point1 = rect.Location;
-                var point2 = rect.Location;
-                using (var brush = new LinearGradientBrush(PointF.Add(point1, new SizeF(rect.Width / 2, 0)),
-                                       PointF.Add(point2, new SizeF(rect.Width / 2, rect.Height)),
-                                       SystemColors.ControlDark,
-                                       SystemColors.ControlLightLight))
-                    gr.FillPath(brush, path);
-                // рисование рамки
-                using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.ControlDark))
-                    gr.DrawPath(pen, path);
-                rect.Inflate(-3, -3);
-                // рисование текста
-                using (var sf = new StringFormat())
-                {
-                    sf.Alignment = StringAlignment.Center;
-                    sf.LineAlignment = StringAlignment.Center;
-                    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
-                        gr.DrawString(Text, Font, brush, rect, sf);
-                }
-            }
+            using var path = GetAreaPath();
+            var rect = path.GetBounds();
+            // рисование градиентной заливки
+            var point1 = rect.Location;
+            var point2 = rect.Location;
+            using (var brush = new LinearGradientBrush(PointF.Add(point1, new SizeF(rect.Width / 2, 0)),
+                                   PointF.Add(point2, new SizeF(rect.Width / 2, rect.Height)),
+                                   SystemColors.ControlDark,
+                                   SystemColors.ControlLightLight))
+                gr.FillPath(brush, path);
+            // рисование рамки
+            using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.ControlDark))
+                gr.DrawPath(pen, path);
+            rect.Inflate(-3, -3);
+            // рисование текста
+            using var sf = new StringFormat();
+            sf.Alignment = StringAlignment.Center;
+            sf.LineAlignment = StringAlignment.Center;
+            using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
+                gr.DrawString(Text, Font, brush, rect, sf);
         }
 
         /// <summary>

@@ -11,28 +11,19 @@ namespace Stories.Model
     {
         private void TuningControl()
         {
-            Size = new Size(150, 25);
+            Size = new Size(150, 52);
             Text = "Верно ли это?";
         }
 
         public IfElement()
         {
-            InitializeComponent();
-            TuningControl();
-        }
-
-        public IfElement(IContainer container)
-        {
-            container.Add(this);
-
-            InitializeComponent();
             TuningControl();
         }
 
         private GraphicsPath GetAreaPath()
         {
             var path = new GraphicsPath();
-            var rect = new RectangleF(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
+            var rect = ClientRectangle;
             path.AddPolygon(new PointF[] 
             { 
                 new PointF(rect.Left + rect.Width / 2, rect.Top),
@@ -54,40 +45,36 @@ namespace Stories.Model
         {
             if (!AutoSize) return;
             var text = string.IsNullOrWhiteSpace(Text) ? "Верно ли это?" : Text;
-            using (var graphics = this.CreateGraphics())
-            {
-                var size = graphics.MeasureString(text, Font, Width - 7);
-                Height = (int)(size.Height * 3);
-            }
+            using var image = new Bitmap(100, 100);
+            using var graphics = Graphics.FromImage(image);
+            var size = graphics.MeasureString(text, Font, Width - 7);
+            Height = (int)(size.Height * 3);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            base.OnPaint(e);
             var gr = e.Graphics;
-            using (var path = GetAreaPath())
+            using var path = GetAreaPath();
+            var rect = path.GetBounds();
+            var point1 = rect.Location;
+            var point2 = rect.Location;
+            using (var brush = new LinearGradientBrush(PointF.Add(point1, new SizeF(rect.Width / 2, 0)),
+                                   PointF.Add(point2, new SizeF(rect.Width / 2, rect.Height)),
+                                   SystemColors.ControlDark,
+                                   SystemColors.ControlLightLight))
+                gr.FillPath(brush, path);
+            using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.ControlDark))
+                gr.DrawPath(pen, path);
+            rect.Inflate(-3, -3);
+            using (var sf = new StringFormat())
             {
-                var rect = path.GetBounds();
-                var point1 = rect.Location;
-                var point2 = rect.Location;
-                using (var brush = new LinearGradientBrush(PointF.Add(point1, new SizeF(rect.Width / 2, 0)),
-                                       PointF.Add(point2, new SizeF(rect.Width / 2, rect.Height)),
-                                       SystemColors.ControlDark,
-                                       SystemColors.ControlLightLight))
-                    gr.FillPath(brush, path);
-                using (var pen = new Pen(base.Enabled ? SystemColors.ControlDarkDark : SystemColors.ControlDark))
-                    gr.DrawPath(pen, path);
-                rect.Inflate(-3, -3);
-                using (var sf = new StringFormat())
-                {
-                    sf.Alignment = StringAlignment.Center;
-                    sf.LineAlignment = StringAlignment.Center;
-                    using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
-                        gr.DrawString(Text, Font, brush, rect, sf);
-                }
-                if (NextYes == null)
-                    DrawYesText(gr, new Point((int)(rect.X + rect.Width - 15), (int)(rect.Y + rect.Height / 2 - 3)));
+                sf.Alignment = StringAlignment.Center;
+                sf.LineAlignment = StringAlignment.Center;
+                using var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText);
+                gr.DrawString(Text, Font, brush, rect, sf);
             }
+            if (NextYes == null)
+                DrawYesText(gr, new Point((int)(rect.X + rect.Width - 15), (int)(rect.Y + rect.Height / 2 - 3)));
         }
 
         /// <summary>
@@ -219,8 +206,8 @@ namespace Stories.Model
             var size = graphics.MeasureString(text, Font);
             var pt = srcPoint;
             pt.Offset(0, -(int)size.Height);
-            using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
-                graphics.DrawString(text, Font, brush, pt);
+            using var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText);
+            graphics.DrawString(text, Font, brush, pt);
         }
 
         [DefaultValue("Нет")]
@@ -229,8 +216,8 @@ namespace Stories.Model
         private void DrawNoText(Graphics graphics, Point srcPoint)
         {
             var text = TextForNo;
-            using (var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText))
-                graphics.DrawString(text, Font, brush, srcPoint);
+            using var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText);
+            graphics.DrawString(text, Font, brush, srcPoint);
         }
     }
 }

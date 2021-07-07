@@ -116,7 +116,7 @@ namespace Stories.Model
             // в режиме перетаскивания рисуем со смещением delta
             if (workMode == WorkMode.Drag)
             {
-                using (var grayPen = new Pen(Color.Gray, 2f))
+                using var grayPen = new Pen(Color.Gray, 2f);
                 foreach (var control in selected)
                 {
                     var r = control.Bounds;
