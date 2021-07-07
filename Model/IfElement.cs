@@ -73,8 +73,8 @@ namespace Stories.Model
                 using var brush = new SolidBrush(base.Enabled ? SystemColors.WindowText : SystemColors.GrayText);
                 gr.DrawString(Text, Font, brush, rect, sf);
             }
-            if (NextYes == null)
-                DrawYesText(gr, new Point((int)(rect.X + rect.Width - 15), (int)(rect.Y + rect.Height / 2 - 3)));
+            //if (NextYes == null)
+            //    DrawYesText(gr, new Point((int)(rect.X + rect.Width - 15), (int)(rect.Y + rect.Height / 2 - 3)));
         }
 
         /// <summary>
